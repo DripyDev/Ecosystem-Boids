@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10f22b7877df491468d8b13f63536a7a, type: 3}
+  m_Name: Boid Settings
+  m_EditorClassIdentifier: 
+  sueloMundo: {fileID: 3439056329107001627, guid: 6bb9e104c4322584e9ee12e1b78794a1,
+    type: 3}
+  minSpeed: 2
+  maxSpeed: 8
+  radioPercepcion: 2.5
+  dstSeparacion: 0.5
+  pesoCohesion: 1
+  pesoSeparacion: 1
+  pesoAlineacion: 1
+  pesoHuirDepredador: 3
+  pesoEvitarChoque: 40
+  ratioTiempovuelo: 0.01
+  ratioTiempoDescanso: 0.1
+  distanciaEvitarColision: 2
+  mascaraObstaculos:
+    serializedVersion: 2
+    m_Bits: 257

@@ -1,0 +1,71 @@
+﻿#pragma kernel CSMain
+static const int threadGroupSize = 1024;
+
+struct Boid {
+    float3 position;
+    float3 direction;
+    float3 velocidad;
+
+    float3 centroManada;
+    float3 separacion;
+    float3 direccionManada;
+    float3 huirDepredador;
+
+    int numeroBoidsManada;
+};
+struct Depredador {
+    float3 position;
+    float3 direction;
+    float3 velocidad;
+
+    float3 presa;
+};
+
+//Lista ReadWrite con los boids
+RWStructuredBuffer<Boid> boids;
+RWStructuredBuffer<Depredador> depredadores;
+int numeroBoids;
+float radioVision;
+float distanciaSeparacion;
+
+int numeroDepredadores;
+float radioVisionDepredador;
+
+
+float Distancia(float3 destino, float3 origen){
+    float3 vect = destino - origen;
+    return sqrt(vect.x*vect.x + vect.y*vect.y + vect.z*vect.z);
+}
+
+[numthreads(threadGroupSize,1,1)]
+//Actualizamos los datos de numero de boids vecinos, la direccion de la manada y la distancia al centro de la manada
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    for (int indexB = 0; indexB < numeroBoids; indexB ++) {
+        //Si el boid no somos nosotros
+        if (id.x != indexB) {
+            //Boid vecino
+            Boid boidB = boids[indexB];
+            //Distancia entre nosotros y el boid vecino
+            float dst = Distancia(boids[id.x].position, boidB.position);
+            if (dst <= radioVision) {
+                //Numero de boids en nuestra manada
+                boids[id.x].numeroBoidsManada += 1;
+                //Direccion manada para la REGLA de ALINEACION
+                boids[id.x].direccionManada += boidB.direction;
+                //Centro de la manada para la REGLA de COHESION
+                boids[id.x].centroManada += boidB.position;
+                //REGLA SEPARACION
+                if (dst <= distanciaSeparacion) {
+                    boids[id.x].separacion -= boidB.position - boids[id.x].position;
+                }
+            }
+        }
+    }
+    for (int i = 0; i < numeroDepredadores; i ++) {
+        float dst = Distancia(boids[id.x].position, depredadores[i].position);
+        if(dst <= radioVision){
+            boids[id.x].huirDepredador += -(depredadores[i].position - boids[id.x].position);
+        }
+    }
+}

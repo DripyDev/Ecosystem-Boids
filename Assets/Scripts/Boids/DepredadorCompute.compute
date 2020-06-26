@@ -1,0 +1,57 @@
+﻿#pragma kernel CSMain
+static const int threadGroupSize = 1024;
+
+struct Boid {
+    float3 position;
+    float3 direction;
+    float3 velocidad;
+
+    float3 centroManada;
+    float3 separacion;
+    float3 direccionManada;
+    float3 huirDepredador;
+
+    int numeroBoidsManada;
+};
+struct Depredador {
+    float3 position;
+    float3 direction;
+    float3 velocidad;
+
+    float3 presa;
+};
+
+//Lista ReadWrite con los boids
+RWStructuredBuffer<Boid> boids;
+RWStructuredBuffer<Depredador> depredadores;
+int numeroBoids;
+
+float radioVisionDepredador;
+
+
+float Distancia(float3 destino, float3 origen){
+    float3 vect = destino - origen;
+    return sqrt(vect.x*vect.x + vect.y*vect.y + vect.z*vect.z);
+}
+
+[numthreads(threadGroupSize,1,1)]
+//Actualizamos los datos de numero de boids vecinos, la direccion de la manada y la distancia al centro de la manada
+void CSMain (uint3 id : SV_DispatchThreadID) {
+    //Valor inicial imposiblemente alto
+    float distanciaPresaCercana = radioVisionDepredador*2;
+    float3 presaMasCercana = float3(0,0,0);
+    for (int indexB = 0; indexB < numeroBoids; indexB ++) {
+        //Boid vecino
+        Boid boidB = boids[indexB];
+        //Distancia entre nosotros y el boid vecino
+        float dst = Distancia(boidB.position, depredadores[id.x].position);
+        if (dst <= radioVisionDepredador) {
+            if(  Distancia(boidB.position, depredadores[id.x].position) < distanciaPresaCercana){
+                distanciaPresaCercana = Distancia(boidB.position, depredadores[id.x].position);
+                //presaMasCercana = boidB.position - depredadores[id.x].position;
+                presaMasCercana = boidB.position - depredadores[id.x].position;
+            }
+        }
+    }
+    depredadores[id.x].presa = presaMasCercana;
+}
