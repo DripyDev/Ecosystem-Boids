@@ -9,7 +9,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{da76e169-30df-5d4a-2d19-e74009022a8e}</ProjectGuid>
+    <ProjectGuid>{b70db671-6d2b-e7d0-e5f4-bcbf2adb7519}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -95,6 +95,7 @@
      <Compile Include="Assets\Scripts\Ecosystem\Behaviour\Rabbit.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Camera\CameraMovement.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Camera\CameraRotMenu.cs" />
+     <Compile Include="Assets\Scripts\Ecosystem\Datatypes\BDI.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Datatypes\CauseOfDeath.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Datatypes\Coord.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Datatypes\CreatureAction.cs" />
@@ -117,38 +118,28 @@
      <Compile Include="Assets\Scripts\Ecosystem\Terrain\TerrainGenerator.cs" />
      <None Include="Assets\Paquetes\TextMesh Pro\Resources\Shaders\TMPro.cginc" />
      <None Include="Assets\Paquetes\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile Overlay.shader" />
-     <None Include="Assets\Logs\CausasMuerte\causasMuerte_2020-6-26-12-31-47.txt" />
      <None Include="Assets\Scripts\Boids\DepredadorCompute.compute" />
      <None Include="Assets\Paquetes\TextMesh Pro\Resources\Shaders\TMP_Bitmap.shader" />
-     <None Include="Assets\Logs\CausasMuerte\causasMuerte_2020-6-26-12-32-56.txt" />
      <None Include="Assets\Paquetes\TextMesh Pro\Examples &amp; Extras\Fonts\Oswald-Bold - OFL.txt" />
-     <None Include="Assets\Logs\CausasMuerte\causasMuerte_2020-6-26-12-27-42.txt" />
      <None Include="Assets\Paquetes\TextMesh Pro\Examples &amp; Extras\Fonts\Anton OFL.txt" />
      <None Include="Assets\Scripts\Boids\BoidCompute.compute" />
      <None Include="Assets\Paquetes\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
-     <None Include="Assets\Logs\Velocidad\velocidadFox_2020-6-26-12-32-56.txt" />
      <None Include="Assets\Paquetes\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface.shader" />
-     <None Include="Assets\Logs\Velocidad\velocidadRabbit_2020-6-26-12-32-56.txt" />
      <None Include="Assets\Paquetes\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
      <None Include="Assets\Paquetes\TextMesh Pro\Resources\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
-     <None Include="Assets\Logs\RangoVision\rangoVisionFox_2020-6-26-12-32-57.txt" />
      <None Include="Assets\Paquetes\TextMesh Pro\Resources\Shaders\TMP_SDF.shader" />
      <None Include="Assets\Paquetes\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
      <None Include="Assets\Paquetes\TextMesh Pro\Resources\Shaders\TMPro_Properties.cginc" />
      <None Include="Assets\Paquetes\TextMesh Pro\Resources\Shaders\TMPro_Surface.cginc" />
      <None Include="Assets\Paquetes\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
-     <None Include="Assets\Logs\NSeres\seres_2020-6-26-12-32-57.txt" />
      <None Include="Assets\Paquetes\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile Masking.shader" />
-     <None Include="Assets\Logs\CausasMuerte\causasMuerte_2020-6-26-12-29-23.txt" />
      <None Include="Assets\Paquetes\TextMesh Pro\Resources\Shaders\TMP_SDF Overlay.shader" />
      <None Include="Assets\Paquetes\TextMesh Pro\Resources\Shaders\TMP_Bitmap-Mobile.shader" />
-     <None Include="Assets\Logs\CausasMuerte\causasMuerte_2020-6-26-12-30-18.txt" />
      <None Include="Assets\Paquetes\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
      <None Include="Assets\Paquetes\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile.shader" />
      <None Include="Assets\Scripts\Ecosystem\Shaders\Animal.shader" />
      <None Include="Assets\Scripts\Ecosystem\Shaders\Terrain.shader" />
      <None Include="Assets\Paquetes\TextMesh Pro\Resources\Shaders\TMP_Sprite.shader" />
-     <None Include="Assets\Logs\RangoVision\rangoVisionRabbit_2020-6-26-12-32-57.txt" />
      <None Include="Assets\Paquetes\TextMesh Pro\Examples &amp; Extras\Fonts\Bangers - OFL.txt" />
  <Reference Include="UnityEngine">
  <HintPath>D:/Program Files/Unity/Unity/2019.3.0f6/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
@@ -690,39 +681,39 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Unity.Timeline.Editor.csproj">
-      <Project>{5f5fab68-786a-39ae-5ebc-b537764892ce}</Project>
+      <Project>{bcf0475a-018f-1da3-eec8-423555df1cbe}</Project>
       <Name>Unity.Timeline.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.VSCode.Editor.csproj">
-      <Project>{df6ea247-0796-2be5-7487-641d7f418fa8}</Project>
+      <Project>{c6a18113-aa63-9032-f31a-940adf8150fe}</Project>
       <Name>Unity.VSCode.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.TextMeshPro.Editor.csproj">
-      <Project>{cafeee1b-deac-4788-354d-568284b2e774}</Project>
+      <Project>{5fbc132d-d956-bbfa-136a-93fbad42fc37}</Project>
       <Name>Unity.TextMeshPro.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="UnityEngine.UI.csproj">
-      <Project>{bbe990c4-2416-b1f5-3b80-002075751415}</Project>
+      <Project>{e31c20e5-2495-e474-f0e8-b5fe8ab793fb}</Project>
       <Name>UnityEngine.UI</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.Timeline.csproj">
-      <Project>{d24df553-cbb5-88a4-76eb-8773ac8e9728}</Project>
+      <Project>{ad956366-b81b-8842-0f50-dde68cb99e5b}</Project>
       <Name>Unity.Timeline</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.CollabProxy.Editor.csproj">
-      <Project>{2b665e9c-24c7-a5d8-ffb9-035c00ca258b}</Project>
+      <Project>{6e28318c-3393-f11a-7a51-d98edb7f91b5}</Project>
       <Name>Unity.CollabProxy.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.Rider.Editor.csproj">
-      <Project>{b7d1afdb-6070-2333-566e-4f850e3b2548}</Project>
+      <Project>{0fb0b9d4-0917-bb4f-e06b-4c8a5958765b}</Project>
       <Name>Unity.Rider.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.TextMeshPro.csproj">
-      <Project>{215b400a-c729-ce5d-da6b-7e77ae3db74a}</Project>
+      <Project>{5318d49b-bbbf-52c3-1008-1bc6d3d5c18b}</Project>
       <Name>Unity.TextMeshPro</Name>
     </ProjectReference>
     <ProjectReference Include="UnityEditor.UI.csproj">
-      <Project>{d6ce3f19-3507-e1bf-9cec-93671582b427}</Project>
+      <Project>{916dcb2e-1875-1849-03a2-f957fecf8b1b}</Project>
       <Name>UnityEditor.UI</Name>
     </ProjectReference>
   </ItemGroup>

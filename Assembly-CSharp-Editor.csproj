@@ -9,7 +9,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{3c9093b4-ce94-9dd2-02d5-fc6acbc0b95d}</ProjectGuid>
+    <ProjectGuid>{634ba097-87df-f3ba-2194-7d297b2557d9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp-Editor</AssemblyName>
@@ -240,7 +240,7 @@
  <HintPath>D:/Program Files/Unity/Unity/2019.3.0f6/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
  </Reference>
  <Reference Include="nunit.framework">
- <HintPath>C:/Users/doait/OneDrive/Escritorio/Aitor/4º/TFG/repositorio/Ecosystem+Boids/Ecosystem+Boids/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
+ <HintPath>C:/Users/doait/OneDrive/Escritorio/Aitor/4º/TFG/repositorio/Prueba/PruebaEcosistem-boid/Library/PackageCache/com.unity.ext.nunit@1.0.0/net35/unity-custom/nunit.framework.dll</HintPath>
  </Reference>
  <Reference Include="mscorlib">
  <HintPath>D:/Program Files/Unity/Unity/2019.3.0f6/Editor/Data/MonoBleedingEdge/lib/mono/4.7.1-api/mscorlib.dll</HintPath>
@@ -599,51 +599,51 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp.csproj">
-      <Project>{da76e169-30df-5d4a-2d19-e74009022a8e}</Project>
+      <Project>{b70db671-6d2b-e7d0-e5f4-bcbf2adb7519}</Project>
       <Name>Assembly-CSharp</Name>
     </ProjectReference>
     <ProjectReference Include="UnityEditor.TestRunner.csproj">
-      <Project>{0aa51d2a-bb8b-424a-38b6-1c7d0169db5e}</Project>
+      <Project>{7a29fb00-ccb5-ed38-d3d0-76e2459b84a5}</Project>
       <Name>UnityEditor.TestRunner</Name>
     </ProjectReference>
     <ProjectReference Include="UnityEngine.TestRunner.csproj">
-      <Project>{9db48d8c-e3ae-0342-01ae-661c8ee5c700}</Project>
+      <Project>{9ee20200-9abb-19cb-b11b-ada9c75ebfce}</Project>
       <Name>UnityEngine.TestRunner</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.Timeline.Editor.csproj">
-      <Project>{5f5fab68-786a-39ae-5ebc-b537764892ce}</Project>
+      <Project>{bcf0475a-018f-1da3-eec8-423555df1cbe}</Project>
       <Name>Unity.Timeline.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.VSCode.Editor.csproj">
-      <Project>{df6ea247-0796-2be5-7487-641d7f418fa8}</Project>
+      <Project>{c6a18113-aa63-9032-f31a-940adf8150fe}</Project>
       <Name>Unity.VSCode.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.TextMeshPro.Editor.csproj">
-      <Project>{cafeee1b-deac-4788-354d-568284b2e774}</Project>
+      <Project>{5fbc132d-d956-bbfa-136a-93fbad42fc37}</Project>
       <Name>Unity.TextMeshPro.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="UnityEngine.UI.csproj">
-      <Project>{bbe990c4-2416-b1f5-3b80-002075751415}</Project>
+      <Project>{e31c20e5-2495-e474-f0e8-b5fe8ab793fb}</Project>
       <Name>UnityEngine.UI</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.Timeline.csproj">
-      <Project>{d24df553-cbb5-88a4-76eb-8773ac8e9728}</Project>
+      <Project>{ad956366-b81b-8842-0f50-dde68cb99e5b}</Project>
       <Name>Unity.Timeline</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.CollabProxy.Editor.csproj">
-      <Project>{2b665e9c-24c7-a5d8-ffb9-035c00ca258b}</Project>
+      <Project>{6e28318c-3393-f11a-7a51-d98edb7f91b5}</Project>
       <Name>Unity.CollabProxy.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.Rider.Editor.csproj">
-      <Project>{b7d1afdb-6070-2333-566e-4f850e3b2548}</Project>
+      <Project>{0fb0b9d4-0917-bb4f-e06b-4c8a5958765b}</Project>
       <Name>Unity.Rider.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.TextMeshPro.csproj">
-      <Project>{215b400a-c729-ce5d-da6b-7e77ae3db74a}</Project>
+      <Project>{5318d49b-bbbf-52c3-1008-1bc6d3d5c18b}</Project>
       <Name>Unity.TextMeshPro</Name>
     </ProjectReference>
     <ProjectReference Include="UnityEditor.UI.csproj">
-      <Project>{d6ce3f19-3507-e1bf-9cec-93671582b427}</Project>
+      <Project>{916dcb2e-1875-1849-03a2-f957fecf8b1b}</Project>
       <Name>UnityEditor.UI</Name>
     </ProjectReference>
   </ItemGroup>

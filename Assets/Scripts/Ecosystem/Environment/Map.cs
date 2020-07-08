@@ -4,6 +4,7 @@ using UnityEngine;
 
 ///<summary> The map is divided into n x n regions, with a list of entities for each region
 /// This allows an entity to more quickly find other nearby entities</summary>
+//NOTA: No se puede asignar a ningun objeto porque no desciende de monobehaviour
 public class Map {
     ///<summary>Matriz de regiones del mapa y los animales que hay en cada region</summary>
     public readonly List<LivingEntity>[, ] map;
@@ -55,7 +56,7 @@ public class Map {
     }
 
     public LivingEntity ClosestEntity (Coord origin, float viewDistance) {
-        List<RegionInfo> visibleRegions = GetRegionsInView (origin, viewDistance);
+        List<RegionInfo> visibleRegions = GetRegionsInView (origin, viewDistance);//Regiones visibles ordenadas en distancia a nosotros
         LivingEntity closestEntity = null;
         float closestSqrDst = viewDistance * viewDistance + 0.01f;
 
@@ -172,10 +173,10 @@ public class Map {
     public void DrawDebugGizmos (Coord coord, float viewDst) {
         // Settings:
         bool showViewedRegions = true;
-        bool showOccupancy = false;
+        bool showOccupancy = true;
         float height = Environment.tileCentres[0, 0].y + 0.1f;
         Gizmos.color = Color.black;
-
+        Debug.Log("Estoy en gizmos de map");
         // Draw:
         int regionX = coord.x / regionSize;
         int regionY = coord.y / regionSize;

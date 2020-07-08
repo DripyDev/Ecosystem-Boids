@@ -16,7 +16,6 @@ public class Environment : MonoBehaviour {
     //Probabilidad ajustable de aparicion de arboles
     [Header ("Trees")]
     public MeshRenderer treePrefab;
-    public GameObject algo;
     [Range (0, 1)]
     public float treeProbability;
 
@@ -134,7 +133,6 @@ public class Environment : MonoBehaviour {
         //seed auxiliar que cambia cada vez. Si usamos la variable seed, al ser siempre el mismo valor
         //genera siempre el mismo numero random
         var aux_seed = System.DateTime.Now.Millisecond;
-
         var spawnPrng = new System.Random (aux_seed);
         //Lista de coordenadas spawneables, haya donde se pueda andar
         var spawnCoords = new List<Coord> (walkableCoords);
@@ -354,7 +352,7 @@ public class Environment : MonoBehaviour {
         // Random chance of returning foward tile (if walkable)
         if (prng.NextDouble () < forwardProbability) {
             Coord forwardCoord = current + forwardOffset;
-
+            //Comprobamos que sea una coordenada valida
             if (forwardCoord.x >= 0 && forwardCoord.x < size && forwardCoord.y >= 0 && forwardCoord.y < size) {
                 if (walkable[forwardCoord.x, forwardCoord.y]) {
                     return forwardCoord;

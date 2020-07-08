@@ -6,11 +6,7 @@ public class Plant : LivingEntity {
     public float amountRemaining = 1;
     const float consumeSpeed = 8;
 
-    /// <summary>
-    /// Update is called every frame, if the MonoBehaviour is enabled.
-    /// </summary>
-    void Update()
-    {
+    void Update() {
         //La planta se restaura poco a poco
         if(amountRemaining<1 && transform.localScale.x < 1){
             amountRemaining += Time.deltaTime * 1/50;

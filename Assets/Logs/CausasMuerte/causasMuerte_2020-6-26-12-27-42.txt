@@ -1,5 +1,0 @@
-Causas muerte
- Conejos 	 ZorrosEaten: 7	Eaten: 0
-Hunger: 0	Hunger: 0
-Thirst: 0	Thirst: 0
-Age: 0	Age: 0

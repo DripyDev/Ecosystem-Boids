@@ -78,10 +78,11 @@ public static class EnvironmentUtility {
         }
 
         int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
-        if (w < 0) {
+        //Comprobamos si el eje x e y va a tener que avanzar en positivo o negativo
+        if (w < 0) {//Si X2 esta a la izquierda de X. El eje x avanzara en negativo
             dx1 = -1;
             dx2 = -1;
-        } else if (w > 0) {
+        } else if (w > 0) {//X2 esta a la derecha de X. El eje X avanza en positivo
             dx1 = 1;
             dx2 = 1;
         }
@@ -91,6 +92,7 @@ public static class EnvironmentUtility {
             dy1 = 1;
         }
 
+        //Comprobamos en que eje hay mas diferencia. Lo usaremos para iterar
         int longest = absW;
         int shortest = absH;
         if (longest <= shortest) {
@@ -104,7 +106,7 @@ public static class EnvironmentUtility {
             dx2 = 0;
         }
 
-        int numerator = longest >> 1;
+        int numerator = longest >> 1;//Desplazamiento derecho de bit. Divide entre 2
         Coord[] path = new Coord[longest];
         for (int i = 1; i <= longest; i++) {
             numerator += shortest;
@@ -127,7 +129,7 @@ public static class EnvironmentUtility {
             catch (System.Exception)
             {
                 Debug.Log("ERROR EN PATHFINDER");    
-                throw;
+                //throw;
             }
         }
         return path;

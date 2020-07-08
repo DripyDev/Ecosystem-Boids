@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using System;
+using System.Collections;
 using static System.Math;
 
 public class Genes {
@@ -10,44 +12,44 @@ public class Genes {
     public readonly bool isMale;
     ///<summary>Array con los valores de diferentes genes: 
     ///[velocidad, deseabilidad, tiempo embarazo, rango vision, curiosidad, reproductive urge, crecer mas rapido, sentimiento manada]</summary>
-    public readonly int[] values;
+    public readonly BitArray values;
 
-    public Genes (int[] values) {
+    public Genes (BitArray valuesB) {
         isMale = RandomValue () < 0.5f;
-        this.values = values;
+        this.values = valuesB;
     }
 
     public static Genes RandomGenes (int num) {
-        int[] values = new int[num];
+        BitArray valuesB = new BitArray(num);
         for (int i = 0; i < num; i++) {
             //mutationChance% de activar cada gen al principio
-            values[i] = RandomValue()<mutationChance? 1:0;
+            valuesB[i] = RandomValue()<mutationChance? true:false;
         }
-        return new Genes (values);
+        return new Genes (valuesB);
     }
 
     public static Genes InheritedGenes (Genes mother, Genes father) {
-        int[] values = new int[mother.values.Length];
-        // TODO: implement inheritance
+        BitArray valuesB = new BitArray(mother.values.Length);
+        
         for (int i = 0; i < father.values.Length; i++) {
             //Ambos tienen el gen activado, el hijo lo hereda pero puede que haya mutacion
-            if(father.values[i] == mother.values[i] && father.values[i] == 1){
-                values[i] = RandomValue()<mutationChance/10? 0:1;
+            if(father.values[i] == mother.values[i] && father.values[i]){
+                valuesB[i] = RandomValue()<mutationChance/10? false:true;
             }
             else{
                 //Uno de los padres tiene el gen, 50% de heredar y 1% de mutacion
-                if(father.values[i] == 1 || mother.values[i] == 1){
-                    values[i] = RandomValue() > 0.5? 1:0;
-                    if(values[i] == 1){ values[i] = RandomValue() > mutationChance/10? 1:0;}
-                    else{ values[i] = RandomValue() > mutationChance/10? 0:1;}
+                if(father.values[i] || mother.values[i]){
+                    valuesB[i] = RandomValue() > 0.5? true:false;
+                    if(valuesB[i]){ valuesB[i] = RandomValue() > mutationChance/10? true:false;}
+                    else{ valuesB[i] = RandomValue() > mutationChance/10? false:true;}
                 }
                 //Ninguno tiene el gen, solo mutacion% de poder tenerlo
                 else{
-                    values[i] = RandomValue()<mutationChance? 1:0;
+                    valuesB[i] = RandomValue()<mutationChance? true:false;
                 }
             }
         }
-        Genes genes = new Genes (values);
+        Genes genes = new Genes (valuesB);
         return genes;
     }
 

@@ -28,7 +28,7 @@ public class Boid : MonoBehaviour {
     ///<summary>Tiempo de vuelo. Cuando llega a 1 el boid devera descansar en el suelo</summary>
     public float tVuelo;
     ///<summary>Indica si estamos en el suelo descansando o no</summary>
-    public bool descansando = false;
+    private bool descansando = false;
     //Temporal para gizmos
     public Vector3 r1,r2,r3,r4, r5;
     //Vector auxiliar para no escribir todo el rato vectores nulos

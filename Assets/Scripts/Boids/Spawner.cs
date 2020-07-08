@@ -26,12 +26,15 @@ public class Spawner : MonoBehaviour
 
     //void Awake() {
     void Start() {
+        var boidHolderAux = GameObject.Find("BoidHolder");
+        var depredadorHolderAux = GameObject.Find("DepredadorHolder");
         //Inicializamos los boids
         for (int i = 0; i < numeroBoids; i++) {
             Vector3 posRandom = transform.position + Random.insideUnitSphere * radioSpawner;
             var boid = Instantiate(prefab);
             //boid.transform.position = posRandom;
             boid.Inicializar(settings, posRandom);
+            boid.transform.parent = boidHolderAux.transform;
 
             boid.transform.position = posRandom;
             boid.transform.forward = Random.insideUnitSphere;
@@ -51,6 +54,7 @@ public class Spawner : MonoBehaviour
             Vector3 posRandom = transform.position + diferenciaD + Random.insideUnitSphere * radioSpawner;
             var dep = Instantiate(prefabDepredador);
             dep.Inicializar(settingsDepredador, posRandom);
+            dep.transform.parent = depredadorHolderAux.transform;
             todosDepredadores.Add(dep);
 
             dep.transform.position = posRandom;

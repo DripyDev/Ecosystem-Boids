@@ -94,22 +94,22 @@ public class Animal : LivingEntity {
         //NO ESTA SUMANDO BIEN LAS VELOCIDADES
         //Prueba gen velocidad:
         //SI LA VELOCIDAD EN FUNCION DE SI TIENE PADRES O NO LA PONEMOS EN INIT, AQUI SOLO HAY QUE SUMARLE Y COMPROBAR QUE SEA UNA CRIA
-        if(genes.values[0] == 1){
+        if(genes.values[0]){
             moveSpeed += 0.1f;
         }
         //Tal y como esta ahora el color con la edad, esto se sobreescribe
         //Prueba gen deseabilidad (solo para machos):
-        if(genes.values[1] == 1 && genes.isMale){
+        if(genes.values[1] && genes.isMale){
             //print("Gen deseabilidad activado. I AM SEXY, BOY");
             material.color += new Color(material.color.r + 0.3f,0,0,0);
         }
         //Prueba gen tiempo embarazo:
-        if(genes.values[2] == 1 && !genes.isMale){
+        if(genes.values[2] && !genes.isMale){
             ratioTiempoEmbarazo = (fatherVals.genes != null && motherVals.genes != null)? 
                 ((motherVals.rTiempoEmbarazo + fatherVals.rTiempoEmbarazo)/2 + 0.1f):(1.1f);
         }
         //Prueba gen rango vision:
-        if(genes.values[3] == 1){
+        if(genes.values[3]){
             print("Gen rango vision activado. I AM CATALEJO, BOY");
             maxViewDistance +=  2;
         }
@@ -118,12 +118,12 @@ public class Animal : LivingEntity {
             print("Gen velocidad activado. I AM SPEED, BOY");
         }*/
         //Prueba gen reproductive urge:
-        if(genes.values[5] == 1){
+        if(genes.values[5]){
             ratioReproductiveUrge = (fatherVals.genes != null && motherVals.genes != null)? 
                 ((motherVals.rReproductiveUrge + fatherVals.rReproductiveUrge)/2 + 0.1f) : 1.1f;
         }
         //Prueba gen crecer mas rapido:
-        if(genes.values[6] == 1){
+        if(genes.values[6]){
             ratioCrecimiento = (fatherVals.genes != null && motherVals.genes != null)? 
                 ((motherVals.rCrecimiento + fatherVals.rCrecimiento)/2 + 0.1f) : (ratioCrecimiento * 1.1f);
         }
@@ -155,6 +155,14 @@ public class Animal : LivingEntity {
         }
     }
 
+    private int[] BitArrayToIntArray(BitArray lista){
+        var aux = new int[lista.Count];
+        for (int i = 0; i < lista.Count; i++) {
+            aux[i] = lista[i]? 1:0;
+        }
+        return aux;
+    }
+
     ///<summary>Inicializamos el color y los genes</summary>
     public override void Init (Coord coord) {
         env = (Environment) GameObject.Find("Environment").GetComponent("Environment");
@@ -164,10 +172,10 @@ public class Animal : LivingEntity {
 
         //Si somos la primera generacion, tenemos genes random, sino los heredamos
         if(fatherVals.genes == null && motherVals.genes == null) {
-            genes = Genes.RandomGenes (7); val = genes.values;   
+            genes = Genes.RandomGenes (7); val = BitArrayToIntArray(genes.values);   
         }
         else {
-            genes = Genes.InheritedGenes(motherVals.genes, fatherVals.genes); val = genes.values;
+            genes = Genes.InheritedGenes(motherVals.genes, fatherVals.genes); val = BitArrayToIntArray(genes.values);
             //Hemos nacido por reproduccion sexual, somos crias, nos movemos mas lento.
             /*print("Nacemos por reproduccion sexual, somos crias, VELOCIDAD PADRE: " + fatherVals.speed);
             print("Nacemos por reproduccion sexual, somos crias, VELOCIDAD MADRE: " + motherVals.speed);
@@ -196,7 +204,7 @@ public class Animal : LivingEntity {
         //var colorR = material.color.r;
         //material.color = (genes.isMale) ? (maleColour + new Color(edad+colorR,edad,edad,0)) : (femaleColour + new Color(edad,edad,edad,0));
         //Gen deseabilidad activado, tenemos en cuenta que el material es mas rojo
-        if(genes.values[1]==1)
+        if(genes.values[1])
             material.color = (genes.isMale) ? (maleColour + new Color(edad+0.3f,edad,edad,0)) : (femaleColour + new Color(edad,edad,edad,0));
         else
             material.color = (genes.isMale) ? (maleColour + new Color(edad,edad,edad,0)) : (femaleColour + new Color(edad,edad,edad,0));
@@ -424,6 +432,7 @@ public class Animal : LivingEntity {
     }
 
     ///<summary>Dado un animal, devuelve la estructura Padres con los valores inicializados</summary>
+    //NOTA: NO HARIA FALTA SI HUBIERA UN CONSTRUCTOR EN LA ESTRUCTURA Padres
     private Padres CrearPadres(Animal animal){
         var padre = new Padres();
         padre.genes = animal.genes;

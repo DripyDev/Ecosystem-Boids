@@ -77,7 +77,6 @@ public class LivingEntity : MonoBehaviour {
                     print("restamos en velocidadConejos: " + ((Animal)this).moveSpeed);
             }
             
-            //AdministradorCausasMuerte.ActualizarCausas(species, cause);
             //Registramos la muerte
             Environment.RegisterDeath (this, cause);
             Destroy (gameObject);
