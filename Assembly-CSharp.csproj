@@ -90,6 +90,7 @@
      <Compile Include="Assets\Scripts\Boids\Settings\DepredadorSettings.cs" />
      <Compile Include="Assets\Scripts\Boids\Spawner.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Behaviour\Animal.cs" />
+     <Compile Include="Assets\Scripts\Ecosystem\Behaviour\Fox.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Behaviour\LivingEntity.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Behaviour\Plant.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Behaviour\Rabbit.cs" />

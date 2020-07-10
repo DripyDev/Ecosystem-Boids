@@ -13,7 +13,7 @@ public class Map {
     readonly int numRegions;
     public int numEntities;
 
-    //No es una funcion, es una variable
+    //No es una funcion, es un constructor
     ///<summary>Mapa de tamaño size que va a ser dividido en regiones de tamaño regionSize</summary>
     public Map (int size, int regionSize) {
         this.regionSize = regionSize;

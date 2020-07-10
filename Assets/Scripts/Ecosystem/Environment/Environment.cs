@@ -47,7 +47,7 @@ public class Environment : MonoBehaviour {
     static System.Random prng;
     TerrainGenerator.TerrainData terrainData;
 
-    ///<summary></summary>
+    ///<summary>Guarda la especie y el mapa correspondiente a esa especie</summary>
     static Dictionary<Species, Map> speciesMaps;
 
     //Listas con el numero de seres por tiempo (el tiempo es el indice que va a ser por fotogramas)
@@ -620,6 +620,8 @@ public class Environment : MonoBehaviour {
         ( (Animal) ent).fatherVals = fath;
         ( (Animal) ent).motherVals = moth;
         ent.cria = true;
+        //Reseteamos los valores de la cria
+        ((Animal) ent).edad = 0f;((Animal) ent).hunger = 0f;((Animal) ent).thirst = 0f;((Animal) ent).reproductiveUrge = 0f;
 
         ent.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
         ent.Init(pos);
@@ -629,19 +631,15 @@ public class Environment : MonoBehaviour {
         var rabbitHolderAux = GameObject.Find("RabbitHolder");
         var plantHolderAux = GameObject.Find("PlantHolder");
         print("Spawneamos un: " + ent.species);
-        if(ent.species == Species.Fox){
+
+        //Colocamos la entidad en los holders
+        if(ent.species == Species.Fox)
             ent.transform.parent = foxHolderAux.transform;
-        }
-        if(ent.species == Species.Rabbit){
+        if(ent.species == Species.Rabbit)
             ent.transform.parent = rabbitHolderAux.transform;
-        }
-        if(ent.species == Species.Plant){
+        if(ent.species == Species.Plant)
             ent.transform.parent = plantHolderAux.transform;
-        }
-        /*if(prefab.species == Species.Fox)
-            velocidadZorros += ((Animal) ent).moveSpeed;
-        else
-            velocidadConejos += ((Animal) ent).moveSpeed;*/
+        
         return ent;
     }
 

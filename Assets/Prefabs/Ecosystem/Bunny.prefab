@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2589637962258072678}
+  - component: {fileID: -2790514891459411351}
   - component: {fileID: 3874918950189636065}
   - component: {fileID: -3800553892912618399}
   - component: {fileID: 5395976597402928770}
@@ -34,7 +35,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3874918950189636065
+--- !u!114 &-2790514891459411351
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -42,6 +43,50 @@ MonoBehaviour:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7990116638631473043}
   m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bedaaf57bfc794db9841c3ef111f20f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colourMaterialIndex: 2
+  species: 4
+  material: {fileID: 2100000, guid: 2c423ba3ec69b4461a99ca939a93b4ac, type: 2}
+  coord:
+    x: 66
+    y: 2
+  mapIndex: 0
+  mapCoord:
+    x: 0
+    y: 0
+  cria: 0
+  maxViewDistance: 10
+  diet: 2
+  currentAction: 0
+  val: 
+  maleColour: {r: 0.35686275, g: 0.23137257, b: 0.12941177, a: 0}
+  femaleColour: {r: 0.6509804, g: 0.45098042, b: 0.32156864, a: 0}
+  env: {fileID: 0}
+  moveSpeed: 1.5
+  ratioCrecimiento: 1
+  ratioReproductiveUrge: 1
+  ratioTiempoEmbarazo: 1
+  hunger: 0.3
+  thirst: 0.3
+  edad: 0.3
+  reproductiveUrge: 0.3
+  embarazada: 0
+  tiempoParaParto: 0
+  potentialMates: []
+  machosRechazados: []
+  hembrasNoImpresionadas: []
+  valorNutricional: 0
+--- !u!114 &3874918950189636065
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7990116638631473043}
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aa81e76bbb0534ab4a7eac5974e8565f, type: 3}
   m_Name: 
@@ -56,6 +101,7 @@ MonoBehaviour:
   mapCoord:
     x: 0
     y: 0
+  cria: 0
   maxViewDistance: 10
   diet: 2
   currentAction: 0
@@ -64,6 +110,9 @@ MonoBehaviour:
   femaleColour: {r: 0.6509434, g: 0.45010933, b: 0.3224012, a: 0}
   env: {fileID: 0}
   moveSpeed: 1.5
+  ratioCrecimiento: 1
+  ratioReproductiveUrge: 1
+  ratioTiempoEmbarazo: 1
   hunger: 0.4
   thirst: 0.4
   edad: 0

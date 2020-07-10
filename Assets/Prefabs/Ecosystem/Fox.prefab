@@ -91,6 +91,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5835452083641406411}
+  - component: {fileID: -4113559257822933333}
   - component: {fileID: 8985062361614467402}
   - component: {fileID: 661991560769683492}
   m_Layer: 0
@@ -115,7 +116,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8985062361614467402
+--- !u!114 &-4113559257822933333
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -123,6 +124,49 @@ MonoBehaviour:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7395166878686290392}
   m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dc943ec0774da044b5b1ee1897630ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  colourMaterialIndex: 2
+  species: 8
+  material: {fileID: 2100000, guid: 4f1aac096a6de4fa19b20fbb6e6c6e33, type: 2}
+  coord:
+    x: 0
+    y: 0
+  mapIndex: 0
+  mapCoord:
+    x: 0
+    y: 0
+  cria: 0
+  maxViewDistance: 10
+  diet: 4
+  currentAction: 0
+  val: 
+  maleColour: {r: 0.7264151, g: 0.20463878, b: 0.099368125, a: 0}
+  femaleColour: {r: 0.6313726, g: 0.25882354, b: 0.09411766, a: 0}
+  env: {fileID: 0}
+  moveSpeed: 1.5
+  ratioCrecimiento: 1
+  ratioReproductiveUrge: 1
+  ratioTiempoEmbarazo: 1
+  hunger: 0.3
+  thirst: 0.3
+  edad: 0.3
+  reproductiveUrge: 0.3
+  embarazada: 0
+  tiempoParaParto: 0
+  potentialMates: []
+  machosRechazados: []
+  hembrasNoImpresionadas: []
+--- !u!114 &8985062361614467402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7395166878686290392}
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aa81e76bbb0534ab4a7eac5974e8565f, type: 3}
   m_Name: 
@@ -137,13 +181,27 @@ MonoBehaviour:
   mapCoord:
     x: 0
     y: 0
+  cria: 0
+  maxViewDistance: 10
   diet: 4
   currentAction: 0
+  val: 
   maleColour: {r: 0, g: 0, b: 0, a: 0}
   femaleColour: {r: 0, g: 0, b: 0, a: 0}
+  env: {fileID: 0}
+  moveSpeed: 1.5
+  ratioCrecimiento: 1
+  ratioReproductiveUrge: 1
+  ratioTiempoEmbarazo: 1
   hunger: 0
   thirst: 0
   edad: 0
+  reproductiveUrge: 0
+  embarazada: 0
+  tiempoParaParto: 0
+  potentialMates: []
+  machosRechazados: []
+  hembrasNoImpresionadas: []
 --- !u!65 &661991560769683492
 BoxCollider:
   m_ObjectHideFlags: 0

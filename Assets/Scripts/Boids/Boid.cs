@@ -252,8 +252,7 @@ public class Boid : MonoBehaviour {
             }
             //Si por algun casual nos salimos del mapa, la region va a ser -1 y va a petar. Reseteamos el boid a al primer cubo del mapa de regiones
             catch(ArgumentOutOfRangeException){
-                print("He petado, nos inicializamos a la primera region del mapa");
-                print("Ultima region en la que estaba: " + regionAnterior);
+                //print("He petado con gpu, ultima region en la que estaba: " + regionAnterior);
                 this.Inicializar(settings, RegionManager.mapaRegiones[0].posicion);
             }
         }
@@ -350,7 +349,7 @@ public class Boid : MonoBehaviour {
         }
         //Si por algun casual nos salimos del mapa, la region va a ser -1 y va a petar. Reseteamos el boid a al primer cubo del mapa de regiones
         catch(ArgumentOutOfRangeException){
-            print("He petado con gpu, ultima region en la que estaba: " + regionAnterior);
+            //print("He petado con gpu, ultima region en la que estaba: " + regionAnterior);
             this.Inicializar(settings, RegionManager.mapaRegiones[0].posicion);
         }
     }
@@ -361,7 +360,7 @@ public class Boid : MonoBehaviour {
     }
 
     void OnDestroy(){
-        print("Me han comido, wey :(");
+        //print("Me han comido, wey :(");
         spawner.todosBoids.Remove(this);
     }
 
