@@ -104,8 +104,8 @@ public class GVelocidad : MonoBehaviour
             if(environment.grafConejos[environment.grafConejos.Count - 1]<=0)
                 this.enabled=false;
             float media = (environment.velocidadConejos/environment.grafConejos[environment.grafConejos.Count - 1]);
-            print("Sumatorio velocidad conejos: " + environment.velocidadConejos + " numero conejos: " + environment.grafConejos[environment.grafConejos.Count - 1]);
-            print("Velocidad media conejos: " + media );
+            //print("Sumatorio velocidad conejos: " + environment.velocidadConejos + " numero conejos: " + environment.grafConejos[environment.grafConejos.Count - 1]);
+            //print("Velocidad media conejos: " + media );
             //Como es asincrono, a veces puede pasar que coja el sumatorio actualizado pero el numero sin actualizar.
             //la media NO puede ser menor a 1.5, si lo es, es problema de la sincronizacion y lo ignoramos
             if(media >=1.5)
@@ -120,8 +120,8 @@ public class GVelocidad : MonoBehaviour
             if(environment.grafZorros[environment.grafZorros.Count - 1]<=0)
                 this.enabled=false;
             float media = (environment.velocidadZorros/environment.grafZorros[environment.grafZorros.Count - 1]);
-            print("Sumatorio velocidad zorros: " + environment.velocidadZorros + " numero zorros: " + environment.grafZorros[environment.grafZorros.Count - 1]);
-            print("Velocidad media zorros: " + media );
+            //print("Sumatorio velocidad zorros: " + environment.velocidadZorros + " numero zorros: " + environment.grafZorros[environment.grafZorros.Count - 1]);
+            //print("Velocidad media zorros: " + media );
             //Como es asincrono, a veces puede pasar que coja el sumatorio actualizado pero el numero sin actualizar.
             //la media NO puede ser menor a 1.5, si lo es, es problema de la sincronizacion y lo ignoramos
             if(media >=1.5)

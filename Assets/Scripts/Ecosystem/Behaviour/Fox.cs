@@ -72,11 +72,30 @@ public class Fox : Animal{
     }
 
     public override void Init (Coord coord) {
-        print("Init de Fox");
         base.Init(coord);
     }
     public void OnMouseDown(){
-        print("Click en mi");
         GameObject.Find("InformacionAnimal").GetComponent<InformacionAnimal>().SetAnimal(this);
+    }
+
+    void OnDrawGizmosSelected () {
+        if (Application.isPlaying) {
+            var surroundings = Environment.Sense (coord, maxViewDistance);
+            var auxcolor = Color.yellow;
+            auxcolor.a = 0.1f;
+            Gizmos.color = auxcolor;
+            Gizmos.DrawSphere(transform.position, maxViewDistance);
+            Gizmos.color = Color.white;
+            if (surroundings.nearestWaterTile != Coord.invalid) {
+                Gizmos.DrawLine (transform.position, Environment.tileCentres[surroundings.nearestWaterTile.x, surroundings.nearestWaterTile.y]);
+            }
+            if (currentAction == CreatureAction.GoingToFood && path != null) {
+                //var path = EnvironmentUtility.GetPath (coord.x, coord.y, foodTarget.coord.x, foodTarget.coord.y);
+                Gizmos.color = Color.black;
+                for (int i = 0; i < path.Length; i++) {
+                    Gizmos.DrawSphere (Environment.tileCentres[path[i].x, path[i].y], .2f);
+                }
+            }
+        }
     }
 }

@@ -57,15 +57,10 @@ public class AdministradorCausasMuerte : MonoBehaviour
 
     // Start is called before the first frame update
     void Start() {
-        print("se llama a start");
         eatenText[0] = transform.Find("ZorrosText").transform.Find("ZorroEatenInput").GetComponent<Text>(); eatenText[1] = transform.Find("ConejosText").transform.Find("ConejoEatenInput").GetComponent<Text>();
         hungerText[0] = transform.Find("ZorrosText").transform.Find("ZorroHungerInput").GetComponent<Text>(); hungerText[1] = transform.Find("ConejosText").transform.Find("ConejoHungerInput").GetComponent<Text>();
         thirstText[0] = transform.Find("ZorrosText").transform.Find("ZorroThirstInput").GetComponent<Text>(); thirstText[1] = transform.Find("ConejosText").transform.Find("ConejoThirstInput").GetComponent<Text>();
         ageText[0] = transform.Find("ZorrosText").transform.Find("ZorroAgeInput").GetComponent<Text>(); ageText[1] = transform.Find("ConejosText").transform.Find("ConejoAgeInput").GetComponent<Text>();
-        if(eatenText[0] == null)
-            print("No se han guardado las referencias");
-        else
-            print("Se ha guardado la referencia");
         //this.gameObject.SetActive(false);
     }
 }

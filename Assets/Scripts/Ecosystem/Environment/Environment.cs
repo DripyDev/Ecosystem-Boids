@@ -33,7 +33,7 @@ public class Environment : MonoBehaviour {
     public static Vector3[, ] tileCentres;
     //Array de tuplas [(X,Y)] con las coordenadas no ocupadas
     public static bool[, ] walkable;
-    //Variable estatica con el tamaño del mapa
+    ///<summary>Variable estatica con el tamaño del mapa</summary>
     static int size;
     static Coord[, ][] walkableNeighboursMap;
     static List<Coord> walkableCoords;
@@ -178,23 +178,6 @@ public class Environment : MonoBehaviour {
 
     public int GetSpeciesNumber(Species specie){
         return speciesMaps[specie].numEntities;
-    }
-
-    //Mirar como funciona DrawGizmos
-    void OnDrawGizmos () {
-//    void OnDrawGizmosSelected() {
-        //Comentado de origen
-        //Dibuja el campo de vision de los animales?????
-        /* 
-        if (showMapDebug) {
-            if (preyMap != null && mapCoordTransform != null) {
-                Coord coord = new Coord ((int) mapCoordTransform.position.x, (int) mapCoordTransform.position.z);
-                preyMap.DrawDebugGizmos (coord, mapViewDst);
-            }
-        }
-        */
-        //print("He entrado en OnDrawGizmosSelected");
-        
     }
 
     ///<summary>Actualizamos speciesMaps</summary>
@@ -740,5 +723,15 @@ public class Environment : MonoBehaviour {
             aux.Add(pop.prefab);
         }
         return aux;
+    }
+
+    void OnDrawGizmosSelected(){
+        var colorAux = Color.cyan;colorAux.a = 0.05f;
+        Gizmos.color = colorAux;var b = speciesMaps[Species.Rabbit];
+        foreach (var m in speciesMaps){
+            foreach (var x in m.Value.centres) {
+                Gizmos.DrawCube(new Vector3(x.x, 0, x.y), new Vector3(m.Value.regionSize, m.Value.regionSize, m.Value.regionSize));
+            } 
+        }
     }
 }

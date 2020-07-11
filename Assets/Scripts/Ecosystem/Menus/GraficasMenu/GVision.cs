@@ -101,8 +101,8 @@ public class GVision : MonoBehaviour
             if(environment.grafConejos[environment.grafConejos.Count - 1]<=0)
                 this.enabled=false;
             float media = ((float) environment.radioVisionConejos / (float)environment.grafConejos[environment.grafConejos.Count - 1]);
-            print("Sumatorio vision conejos: " + environment.radioVisionConejos + " numero conejos: " + environment.grafConejos[environment.grafConejos.Count - 1]);
-            print("Vision media conejos: " + media );
+            //print("Sumatorio vision conejos: " + environment.radioVisionConejos + " numero conejos: " + environment.grafConejos[environment.grafConejos.Count - 1]);
+            //print("Vision media conejos: " + media );
             //Como es asincrono, a veces puede pasar que coja el sumatorio actualizado pero el numero sin actualizar.
             //la media NO puede ser menor a 1.5, si lo es, es problema de la sincronizacion y lo ignoramos
             if(media >= 10)
@@ -117,8 +117,8 @@ public class GVision : MonoBehaviour
             if(environment.grafZorros[environment.grafZorros.Count - 1]<=0)
                 this.enabled=false;
             float media = ((float) environment.radioVisionZorros / (float)environment.grafZorros[environment.grafZorros.Count - 1]);
-            print("Sumatorio vision zorros: " + environment.radioVisionZorros + " numero zorros: " + environment.grafZorros[environment.grafZorros.Count - 1]);
-            print("Vision media zorros: " + media );
+            //print("Sumatorio vision zorros: " + environment.radioVisionZorros + " numero zorros: " + environment.grafZorros[environment.grafZorros.Count - 1]);
+            //print("Vision media zorros: " + media );
             //Como es asincrono, a veces puede pasar que coja el sumatorio actualizado pero el numero sin actualizar.
             //la media NO puede ser menor a 1.5, si lo es, es problema de la sincronizacion y lo ignoramos
             if(media >=10)

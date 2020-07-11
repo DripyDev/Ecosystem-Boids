@@ -77,7 +77,7 @@ public class Animal : LivingEntity {
     float moveSpeedFactor;
     float moveArcHeightFactor;
     //Array de coordenadas que es el camino que va a coger el agente
-    Coord[] path;
+    protected Coord[] path;
     int pathIndex;
 
     // Other
@@ -424,15 +424,7 @@ public class Animal : LivingEntity {
     }
 
     ///<summary>Dado un animal, devuelve la estructura Padres con los valores inicializados</summary>
-    //NOTA: NO HARIA FALTA SI HUBIERA UN CONSTRUCTOR EN LA ESTRUCTURA Padres
     private Padres CrearPadres(Animal animal){
-        /*var padre = new Padres();
-        padre.genes = animal.genes;
-        padre.speed = animal.moveSpeed;
-        padre.viewDistance = animal.maxViewDistance;
-        padre.rCrecimiento = animal.ratioCrecimiento;
-        padre.rReproductiveUrge = animal.ratioReproductiveUrge;
-        padre.rTiempoEmbarazo = animal.ratioTiempoEmbarazo;*/
         return new Padres(animal.moveSpeed, animal.maxViewDistance, animal.ratioTiempoEmbarazo, animal.ratioCrecimiento, animal.ratioReproductiveUrge, animal.genes);
     }
 
@@ -445,7 +437,7 @@ public class Animal : LivingEntity {
         //Nos hemos reproducido, vaciamos potentialMates y reseteamos reproductiveUrge
         reproductiveUrge = 0f;
         potentialMates.Clear();
-        print("Me han embarazado :) y soy un: " + species);
+        //print("Me han embarazado :) y soy un: " + species);
     }
 
     //NOTA: Falta controlar cuando nos han aceptado y cuando no para que no pidan reproducirse todo el rato al mismo
@@ -458,14 +450,14 @@ public class Animal : LivingEntity {
         //Somos hembras, aceptamos o rechazamos en funcion de la deseabilidad
         else{
             var rndm = UnityEngine.Random.Range(0f, 1f);
-            if((posiblePareja.material.color.r-maleColour.r) > 0f){print("Diferencia color rojo: " + (posiblePareja.material.color.r-maleColour.r));}
+            //if((posiblePareja.material.color.r-maleColour.r) > 0f){print("Diferencia color rojo: " + (posiblePareja.material.color.r-maleColour.r));}
             //Si random entre 0 y 1 + diferencia de color en rojo es mayor a 0.3, aceptamos reproducirnos
             if(rndm+(posiblePareja.material.color.r-maleColour.r) >= 0.3f){
-                print("Aceptamos la solicitus de mating");
+                //print("Aceptamos la solicitus de mating");
                 return true;
             }
             else{
-                print("Rechazamos la solicitud de mating");
+                //print("Rechazamos la solicitud de mating");
                 machosRechazados.Add(posiblePareja);
                 potentialMates.Remove(posiblePareja);
                 return false;
@@ -498,6 +490,7 @@ public class Animal : LivingEntity {
                 }
                 break;
             case CreatureAction.Fleeing:
+                print("Estamos huyendo");
                 //Solo los conejos huyen, asi que nunca deberia de petar porque aqui no entraran los zorros
                 LookAt(base.coord + (base.coord - ((Rabbit)this).depredadorMasCercano));
                 //StartMoveToCoord(base.coord - (base.coord - depredadorMasCercano));
@@ -645,31 +638,6 @@ public class Animal : LivingEntity {
     //Funcion que en Fox y Rabbit va a ser sobreescrita para que llame a ChooseNextAction. Asi lo podemos llamar desde aqui
     protected virtual void ChooseHijo(){
         //print("Llamamos a pruebaChoose desde Animal");
-    }
-
-    void OnDrawGizmosSelected () {
-        if (Application.isPlaying) {
-            var surroundings = Environment.Sense (coord, maxViewDistance);
-            var auxcolor = Color.yellow;
-            auxcolor.a = 0.1f;
-            Gizmos.color = auxcolor;
-            Gizmos.DrawSphere(transform.position, maxViewDistance);
-            Gizmos.color = Color.white;
-            if (surroundings.nearestFoodSource != null) {
-                Gizmos.DrawLine (transform.position, surroundings.nearestFoodSource.transform.position);
-            }
-            if (surroundings.nearestWaterTile != Coord.invalid) {
-                Gizmos.DrawLine (transform.position, Environment.tileCentres[surroundings.nearestWaterTile.x, surroundings.nearestWaterTile.y]);
-            }
-
-            if (currentAction == CreatureAction.GoingToFood) {
-                var path = EnvironmentUtility.GetPath (coord.x, coord.y, foodTarget.coord.x, foodTarget.coord.y);
-                Gizmos.color = Color.black;
-                for (int i = 0; i < path.Length; i++) {
-                    Gizmos.DrawSphere (Environment.tileCentres[path[i].x, path[i].y], .2f);
-                }
-            }
-        }
     }
 
     ///<summary>Datos relevantes de los padres como su velocidad y genes para que puedan heredar los hijos</summary>

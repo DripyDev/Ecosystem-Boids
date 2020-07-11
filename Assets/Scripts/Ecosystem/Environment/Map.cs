@@ -8,8 +8,8 @@ using UnityEngine;
 public class Map {
     ///<summary>Matriz de regiones del mapa y los animales que hay en cada region</summary>
     public readonly List<LivingEntity>[, ] map;
-    readonly Vector2[, ] centres;
-    readonly int regionSize;
+    public readonly Vector2[, ] centres;
+    public readonly int regionSize;
     readonly int numRegions;
     public int numEntities;
 
