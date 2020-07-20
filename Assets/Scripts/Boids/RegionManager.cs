@@ -41,7 +41,10 @@ public class RegionManager : MonoBehaviour
         Vector3 pos, dimensiones;
         dimensiones = new Vector3(xR, yR, zR);
         //Centro de la primera region. Nota: la y es diferente porque es el centro del suelo que esta en y=0 del cubo que queremos subdividir
-        pos = new Vector3(centroObjecto.x - (-X/2) - xR/2, yR/2, centroObjecto.z - (-Z/2) - zR/2);
+        //Centro cuando environment es NOT CENTERED
+        //pos = new Vector3(centroObjecto.x - (-X/2) - xR/2, yR/2, centroObjecto.z - (-Z/2) - zR/2);
+        //Centro cuando environment es CENTERED
+        pos = new Vector3(xR/2, yR/2, zR/2);
 
         Vector3 posX, posY, posZ;
         posY = pos;
@@ -54,12 +57,12 @@ public class RegionManager : MonoBehaviour
             //Eje X
             for (int b = 0; b < raizCubo; b++) {
                 posZ = posX;
-                posX.x -= xR;
+                posX.x += xR;
                 //Eje Z
                 for (int c = 0; c < raizCubo; c++) {
                     regionAux = new Region(posZ, dimensiones);
                     mapaRegiones.Add(regionAux);
-                    posZ.z -= zR;
+                    posZ.z += zR;
                 }
             }
         }

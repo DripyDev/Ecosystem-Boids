@@ -9,14 +9,14 @@ public class LivingEntity : MonoBehaviour {
     public Species species;
     public Material material;
     //Coordenadas de la entidad
-    public Coord coord;
-    //Para no mostrar Coor en el inspector
+    public Vector3Int coord;
+    //Para no mostrar Coord en el inspector
     //[HideInInspector]
+    ///<summary>Indice de la entidad en la lista de entidades de su region del mapa</summary>
     public int mapIndex;
     //[HideInInspector]
-    //Coord es un tipo creado para sustituir a Vector2Int porque el acceso a x e y es mas lento
-    //No entiendo para que es
-    public Coord mapCoord;
+    ///<summary>Son las coordenadas de la region del mapa en la que esta el ente</summary>
+    public Vector2Int mapCoord;
 
     //Booleano que indica si la entidad esta viva o muerta
     protected bool dead;
@@ -24,9 +24,9 @@ public class LivingEntity : MonoBehaviour {
 
 
     ///<summary>Inicializacion de la entidad en el mundo. guardamos su posicion y cargamos su material</summary>
-    public virtual void Init (Coord coord) {
+    public virtual void Init (Vector3Int coord) {
         this.coord = coord;
-        transform.position = Environment.tileCentres[coord.x, coord.y];
+        transform.position = Environment.tileCentres[coord.x, coord.z];
 
         // Set material to the instance material
         var meshRenderer = transform.GetComponentInChildren<MeshRenderer> ();

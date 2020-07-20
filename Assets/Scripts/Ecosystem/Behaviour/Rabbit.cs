@@ -10,7 +10,8 @@ public class Rabbit : Animal {
     //NOTA: EN EL FUTURO TIENE QUE IR EN FUNCION DEL ALGUN GEN
     public float valorNutricional;
     //Variables que antes estaban en Animal
-    public Coord depredadorMasCercano;
+    public Vector3Int depredadorMasCercano;
+    private static Vector3Int cero = new Vector3Int(0,0,0);
     void Start() {
         var aux = new System.Random();
         valorNutricional = Mathf.Max((float) (aux.Next(60)/100), 0.3f);
@@ -34,7 +35,8 @@ public class Rabbit : Animal {
         if (animatingMovement) {
             //print("-------------INICIO MOVIMIENTO---------------------");
             AnimateMove();
-        } else {
+        }
+        else {
             // Handle interactions with external things, like food, water, mates
             HandleInteractions();
             float timeSinceLastActionChoice = Time.time - lastActionChooseTime;
@@ -64,13 +66,14 @@ public class Rabbit : Animal {
         // Get info about surroundings
 
         // Decide next action:
-        Coord coordDepredadorCercano = Environment.SenseDepredador(species, coord, maxViewDistance);
+        Vector3Int coordDepredadorCercano = Environment.SenseDepredador(species, coord, maxViewDistance);
         //NOTA: Cambiar el species!=Species.Fox porque en el futuro puede que haya más animales. Cambiarlo a buscar en el diccionario de depredadores
-        if (coordDepredadorCercano.x+coordDepredadorCercano.y != 0 && species != Species.Fox) {
+        if (coordDepredadorCercano.x+coordDepredadorCercano.z != 0 && species != Species.Fox) {
             HuirDepredador(coordDepredadorCercano);
         }
         //NOTA: Repasar cuando elige que accion
         else {
+            depredadorMasCercano = cero;
             // Eat if (more hungry than thirsty) or (currently eating and not critically thirsty)
             bool currentlyEating = currentAction == CreatureAction.Eating && foodTarget && hunger > 0;
             bool wellFed = hunger < criticalPercent/1.5;
@@ -95,13 +98,13 @@ public class Rabbit : Animal {
     
 
     ///<summary>Huimos en direccion completamente opuesta al depredador mas cercano</summary>
-    private void HuirDepredador(Coord depredador){
+    private void HuirDepredador(Vector3Int depredador){
         depredadorMasCercano = depredador;
         currentAction = CreatureAction.Fleeing;
         CreatePath(base.coord + (base.coord - depredador));
     }
 
-    public override void Init (Coord coord) {
+    public override void Init (Vector3Int coord) {
         //print("Init de Rabbit");
         base.Init(coord);
     }
@@ -110,6 +113,13 @@ public class Rabbit : Animal {
     }
 
     void OnDrawGizmosSelected () {
+        /*if(waterTarget != null){
+            Gizmos.DrawLine(transform.position, waterTarget);
+        }
+        var auxcolor = Color.yellow;
+        auxcolor.a = 0.1f;
+        Gizmos.color = auxcolor;
+        Gizmos.DrawSphere(transform.position, maxViewDistance);*/
         if (Application.isPlaying) {
             var surroundings = Environment.Sense (coord, maxViewDistance);
             var auxcolor = Color.yellow;
@@ -120,15 +130,25 @@ public class Rabbit : Animal {
             if (surroundings.nearestFoodSource != null) {
                 Gizmos.DrawLine (transform.position, surroundings.nearestFoodSource.transform.position);
             }
-            if (surroundings.nearestWaterTile != Coord.invalid) {
-                Gizmos.DrawLine (transform.position, Environment.tileCentres[surroundings.nearestWaterTile.x, surroundings.nearestWaterTile.y]);
+            if (surroundings.nearestWaterTile != Environment.invalid) {
+                Gizmos.color = Color.blue; 
+                Gizmos.DrawLine (transform.position, Environment.tileCentres[surroundings.nearestWaterTile.x, surroundings.nearestWaterTile.z]);
             }
-
+            if(path != null){
+                Gizmos.color = Color.green;
+                for (int i = 0; i < path.Length; i++) {
+                    Gizmos.DrawSphere (Environment.tileCentres[path[i].x, path[i].z], .2f);
+                }
+            }
+            if(depredadorMasCercano != new Vector3(0,0,0)){
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawLine(coord, coord - (depredadorMasCercano - coord));
+            }
             if (currentAction == CreatureAction.GoingToFood && path != null) {
                 //var path = EnvironmentUtility.GetPath (coord.x, coord.y, foodTarget.coord.x, foodTarget.coord.y);
                 Gizmos.color = Color.black;
                 for (int i = 0; i < path.Length; i++) {
-                    Gizmos.DrawSphere (Environment.tileCentres[path[i].x, path[i].y], .2f);
+                    Gizmos.DrawSphere (Environment.tileCentres[path[i].x, path[i].z], .2f);
                 }
             }
         }

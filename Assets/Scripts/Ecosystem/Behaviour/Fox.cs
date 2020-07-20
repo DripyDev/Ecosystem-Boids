@@ -71,7 +71,7 @@ public class Fox : Animal{
         Act ();
     }
 
-    public override void Init (Coord coord) {
+    public override void Init (Vector3Int coord) {
         base.Init(coord);
     }
     public void OnMouseDown(){
@@ -86,14 +86,14 @@ public class Fox : Animal{
             Gizmos.color = auxcolor;
             Gizmos.DrawSphere(transform.position, maxViewDistance);
             Gizmos.color = Color.white;
-            if (surroundings.nearestWaterTile != Coord.invalid) {
-                Gizmos.DrawLine (transform.position, Environment.tileCentres[surroundings.nearestWaterTile.x, surroundings.nearestWaterTile.y]);
+            if (surroundings.nearestWaterTile != Environment.invalid) {
+                Gizmos.DrawLine (transform.position, Environment.tileCentres[surroundings.nearestWaterTile.x, surroundings.nearestWaterTile.z]);
             }
             if (currentAction == CreatureAction.GoingToFood && path != null) {
                 //var path = EnvironmentUtility.GetPath (coord.x, coord.y, foodTarget.coord.x, foodTarget.coord.y);
                 Gizmos.color = Color.black;
                 for (int i = 0; i < path.Length; i++) {
-                    Gizmos.DrawSphere (Environment.tileCentres[path[i].x, path[i].y], .2f);
+                    Gizmos.DrawSphere (Environment.tileCentres[path[i].x, path[i].z], .2f);
                 }
             }
         }

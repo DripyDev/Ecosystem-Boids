@@ -108,6 +108,8 @@
      <Compile Include="Assets\Scripts\Ecosystem\Environment\EnvironmentUtility.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Environment\Map.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Environment\Mapa.cs" />
+     <Compile Include="Assets\Scripts\Ecosystem\Environment\Mundo.cs" />
+     <Compile Include="Assets\Scripts\Ecosystem\Environment\Pathfinder.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Menus\AdministradorCausasMuerte.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Menus\GraficasMenu\GVelocidad.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Menus\GraficasMenu\GVision.cs" />

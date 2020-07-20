@@ -30,25 +30,27 @@ public class Environment : MonoBehaviour {
 
     //Informacion ESTATICA cacheada que usamos muchas veces, por eso esta "cacheada"
     // Cached data:
+    ///<summary>Los centros de cada tile del mapa. Nada que ver son la subdivision del mundo en regiones</summary>
     public static Vector3[, ] tileCentres;
-    //Array de tuplas [(X,Y)] con las coordenadas no ocupadas
+    //Matriz de tuplas [(X,Y)] con las coordenadas no ocupadas
     public static bool[, ] walkable;
     ///<summary>Variable estatica con el tamaño del mapa</summary>
     static int size;
-    static Coord[, ][] walkableNeighboursMap;
-    static List<Coord> walkableCoords;
+    ///<summary>Son las tiles vecinas de cada tile del mapa que son caminables</summary>
+    static Vector3Int[, ][] walkableNeighboursMap;
+    static List<Vector3Int> walkableCoords;
 
     static Dictionary<Species, List<Species>> preyBySpecies;
     static Dictionary<Species, List<Species>> predatorsBySpecies;
 
-    // array of visible tiles from any tile; value is Coord.invalid if no visible water tile
-    static Coord[, ] closestVisibleWaterMap;
+    // array of visible tiles from any tile; value is Vector3Int.invalid if no visible water tile
+    static Vector3Int[, ] closestVisibleWaterMap;
 
     static System.Random prng;
     TerrainGenerator.TerrainData terrainData;
 
     ///<summary>Guarda la especie y el mapa correspondiente a esa especie</summary>
-    static Dictionary<Species, Map> speciesMaps;
+    static Dictionary<Species, Mapa> speciesMaps;
 
     //Listas con el numero de seres por tiempo (el tiempo es el indice que va a ser por fotogramas)
     [HideInInspector]
@@ -71,6 +73,7 @@ public class Environment : MonoBehaviour {
     private GameObject foxHolder;
     private GameObject plantHolder;
     private GameObject rabbitHolder;
+    //Sumatorios
     [HideInInspector]
     public float velocidadZorros = 0f;
     [HideInInspector]
@@ -81,12 +84,13 @@ public class Environment : MonoBehaviour {
     public int radioVisionZorros = 0;
 
     private GameObject menuCausasMuerte;
+    [HideInInspector]
+    public static Vector3Int invalid = new Vector3Int(-1, 0, -1);
 
     //Actualizamos los contadores
     //NOTA: EN UN FUTURO TAMBIEN SE DEBERIAN DE PASAR POR AQUI LOS DATOS PARA LAS GRAFICAS
-    void Update()
-    {
-        if(speciesMaps[Species.Rabbit].numEntities == 0 && speciesMaps[Species.Fox].numEntities == 0){
+    void Update() {
+        if(speciesMaps[Species.Rabbit].numeroEntidades == 0 && speciesMaps[Species.Fox].numeroEntidades == 0){
             //print("NO QUEDAN ANIMALES VIVOS");
         }
 
@@ -94,13 +98,13 @@ public class Environment : MonoBehaviour {
         //Actualizamos los contadores de la pantalla
         //NOTA: Puede que no se deba de actualziar con cada fotograma, deberia de bastar con una vez cada segundo
         //pero no deberia de afectar en nanda a la eficiencia
-        contadorConejo.text = speciesMaps[Species.Rabbit].numEntities.ToString();
-        contadorZorro.text = speciesMaps[Species.Fox].numEntities.ToString();
-        contadorPlanta.text = speciesMaps[Species.Plant].numEntities.ToString();
+        contadorConejo.text = speciesMaps[Species.Rabbit].numeroEntidades.ToString();
+        contadorZorro.text = speciesMaps[Species.Fox].numeroEntidades.ToString();
+        contadorPlanta.text = speciesMaps[Species.Plant].numeroEntidades.ToString();
     }
 
     /// <summary>Inicializa las listas de animales que usamos para imprimir en pantalla con las poblaciones iniciales </summary>
-    private void StartListaAnimales(){
+    private void StartListaAnimales() {
         for (int i = 0; i < initialPopulations.Length; i++)
         {
             switch (initialPopulations[i].prefab.species)
@@ -120,28 +124,28 @@ public class Environment : MonoBehaviour {
 
     /// <summary>Actualiza las variables grafZorros y grafConejos. Se le va a llamar una vez cada segundo </summary>
     void UpdateGrafs(){
-        int zorros = speciesMaps[Species.Fox].numEntities;
-        int conejos = speciesMaps[Species.Rabbit].numEntities;
-        int plantas = speciesMaps[Species.Plant].numEntities;
+        int zorros = speciesMaps[Species.Fox].numeroEntidades;
+        int conejos = speciesMaps[Species.Rabbit].numeroEntidades;
+        int plantas = speciesMaps[Species.Plant].numeroEntidades;
         grafZorros.Add(zorros);
         grafConejos.Add(conejos);
         grafPlantas.Add(plantas);
     }
 
     /// <summary>Spawnea plantas de manera aleatoria en el mapa</summary>
-    void SpawnPlantasTiempo(){
+    private void SpawnPlantasTiempo(){
         //seed auxiliar que cambia cada vez. Si usamos la variable seed, al ser siempre el mismo valor
         //genera siempre el mismo numero random
         var aux_seed = System.DateTime.Now.Millisecond;
         var spawnPrng = new System.Random (aux_seed);
         //Lista de coordenadas spawneables, haya donde se pueda andar
-        var spawnCoords = new List<Coord> (walkableCoords);
+        var spawnCoords = new List<Vector3Int> (walkableCoords);
         if (spawnCoords.Count == 0) {
             Debug.Log ("No hay sitio para spawnear la planta");
             return;
         }
         int spawnCoordIndex = spawnPrng.Next (0, spawnCoords.Count);
-        Coord coord = spawnCoords[spawnCoordIndex];
+        Vector3Int coord = spawnCoords[spawnCoordIndex];
 
         //Instanciamos una planta
         foreach (var population in initialPopulations) {
@@ -150,7 +154,7 @@ public class Environment : MonoBehaviour {
                 entity.Init (coord);
 
                 //Almacenamos la nueva entidad en su correspondiente lista en funcion de la especie
-                speciesMaps[entity.species].Add (entity, coord);
+                speciesMaps[entity.species].Añadir(entity, coord);
                 entity.transform.parent = plantHolder.transform;
             }
         }
@@ -177,60 +181,52 @@ public class Environment : MonoBehaviour {
     }
 
     public int GetSpeciesNumber(Species specie){
-        return speciesMaps[specie].numEntities;
+        return speciesMaps[specie].numeroEntidades;
     }
 
     ///<summary>Actualizamos speciesMaps</summary>
-    public static void RegisterMove (LivingEntity entity, Coord from, Coord to) {
-        speciesMaps[entity.species].Move (entity, from, to);
+    public static void RegisterMove (LivingEntity entity, Vector3Int from, Vector3Int to) {
+        speciesMaps[entity.species].Mover(entity, from, to);
     }
 
     //NOTA: al ser una funcion estatica, no puede llamar a objetos no estaticos
     ///<summary>Eliminamos la entidad del mapa de entidades y actualizamos la lista de causas de muerte</summary>
     public static void RegisterDeath (LivingEntity entity, CauseOfDeath cause) {
-        speciesMaps[entity.species].Remove (entity, entity.coord);
+        speciesMaps[entity.species].Eliminar(entity, entity.coord);
         AdministradorCausasMuerte.ActualizarCausas(entity.species, cause);
-        //Si es el ultimo ser vivo, lo hacemos saber
-        if (speciesMaps.Count >= 0)
-        {
-
-        }
-        else{
-            //print("NO QUEDAN ANIMALES VIVOS.");
-        }
-
     }
 
-    public static Coord SenseWater (Coord coord, int viewDistance) {
-        var closestWaterCoord = closestVisibleWaterMap[coord.x, coord.y];
-        if (closestWaterCoord != Coord.invalid) {
-            float sqrDst = (tileCentres[coord.x, coord.y] - tileCentres[closestWaterCoord.x, closestWaterCoord.y]).sqrMagnitude;
+    //NOTA: PUEDE QUE HAYA ALGO MAS ALQUI EN EL .sqrtMagnitude
+    public static Vector3Int SenseWater (Vector3Int coord, int viewDistance) {
+        var closestWaterCoord = closestVisibleWaterMap[coord.x, coord.z];
+        if (closestWaterCoord != invalid) {
+            float sqrDst = (tileCentres[coord.x, coord.z] - tileCentres[closestWaterCoord.x, closestWaterCoord.z]).sqrMagnitude;
             if (sqrDst <= viewDistance * viewDistance) {
                 return closestWaterCoord;
             }
         }
-        return Coord.invalid;
+        return invalid;
     }
 
     //Dada una coordenada, un animal y una lista de preferencias de comida devuelve la presa mas cercana (sea conejo o planta)
-    public static LivingEntity SenseFood (Coord coord, Animal self, System.Func<LivingEntity, LivingEntity, int> foodPreference) {
+    public static LivingEntity SenseFood (Vector3Int coord, Animal self, System.Func<LivingEntity, LivingEntity, int> foodPreference) {
         var foodSources = new List<LivingEntity> ();
 
         List<Species> prey = preyBySpecies[self.species];
         for (int i = 0; i < prey.Count; i++) {
 
-            Map speciesMap = speciesMaps[prey[i]];
+            Mapa speciesMap = speciesMaps[prey[i]];
 
-            foodSources.AddRange (speciesMap.GetEntities (coord, self.maxViewDistance));
+            foodSources.AddRange (speciesMap.ObtenerEntidades(coord, self.maxViewDistance));
         }
 
         // Sort food sources based on preference function. NOTA: Mirar como alterar la funcion foodPreference para que tenga en cuenta la velocidad... del animal
         foodSources.Sort ((a, b) => foodPreference ((LivingEntity)self, a).CompareTo (foodPreference ((LivingEntity)self, b)));
-
         // Return first visible food source
         for (int i = 0; i < foodSources.Count; i++) {
-            Coord targetCoord = foodSources[i].coord;
-            if (EnvironmentUtility.TileIsVisibile (coord.x, coord.y, targetCoord.x, targetCoord.y)) {
+            Vector3Int targetCoord = foodSources[i].coord;
+            //if (Pathfinder.SeccionVisible(coord.x, coord.z, targetCoord.x, targetCoord.z)) {
+            if (EnvironmentUtility.TileIsVisibile(coord.x, coord.z, targetCoord.x, targetCoord.z)) {
                 return foodSources[i];
             }
         }
@@ -238,9 +234,9 @@ public class Environment : MonoBehaviour {
     }
 
     ///<summary> Return list of animals of the same species, with the opposite gender, who are also searching for a mate</summary>
-    public static List<Animal> SensePotentialMates (Coord coord, Animal self) {
-        Map speciesMap = speciesMaps[self.species];
-        List<LivingEntity> visibleEntities = speciesMap.GetEntities (coord, self.maxViewDistance);
+    public static List<Animal> SensePotentialMates (Vector3Int coord, Animal self) {
+        Mapa speciesMap = speciesMaps[self.species];
+        List<LivingEntity> visibleEntities = speciesMap.ObtenerEntidades(coord, self.maxViewDistance);
         var potentialMates = new List<Animal> ();
 
         for (int i = 0; i < visibleEntities.Count; i++) {
@@ -255,37 +251,37 @@ public class Environment : MonoBehaviour {
     }
 
     ///<summary>Dadas unas coordenadas y la especie de un animal, devuelve el depredador mas cercano</summary>
-    public static Coord SenseDepredador(Species especie, Coord coord, int viewDistance){
+    public static Vector3Int SenseDepredador(Species especie, Vector3Int coord, int viewDistance){
         //NOTA: Creo que funciona, pero hay que repasarlo porsiaca
         //Lista de depredadores de nuestra especie
         var listaEspecieDepredadores = predatorsBySpecies[especie];
         //Lista que va a conetener los mapas de los depredadores de nuestra especie
-        List<Map> mapasDepredadores = new List<Map>();
+        List<Mapa> mapasDepredadores = new List<Mapa>();
         for (int i = 0; i < listaEspecieDepredadores.Count; i++) {
             mapasDepredadores.Add(speciesMaps[ listaEspecieDepredadores[i] ]);
         }
         for (int i = 0; i < mapasDepredadores.Count; i++) {
             //Lista de zorros a la vista
-            List<LivingEntity> depredadoresVisibles = mapasDepredadores[i].GetEntities(coord, viewDistance);
+            List<LivingEntity> depredadoresVisibles = mapasDepredadores[i].ObtenerEntidades(coord, viewDistance);
             if (depredadoresVisibles.Count > 0) {
                 int indiceMasCercano = 0;
                 //print("Numero de zorros visibles: " + zorrosVisibles.Count);
                 for (int j = 0; j < depredadoresVisibles.Count; j++) {
                     //zorrosVisibles[indiceMasCercano] = zorrosVisibles[i];
-                    if (Coord.Distance(depredadoresVisibles[indiceMasCercano].coord, coord) <= Coord.Distance(depredadoresVisibles[j].coord, coord) ) {
+                    if (Vector3Int.Distance(depredadoresVisibles[indiceMasCercano].coord, coord) <= Vector3Int.Distance(depredadoresVisibles[j].coord, coord) ) {
                         indiceMasCercano = j;
                     }
                 }
                 return depredadoresVisibles[indiceMasCercano].coord;
             }
             else {
-                return new Coord(0,0);
+                return new Vector3Int(0,0,0);
             }
         }
-        return new Coord(0,0);
+        return new Vector3Int(0,0,0);
 
         //esto funciona
-        /*Map mapaZorros = speciesMaps[Species.Fox];
+        /*Mapa mapaZorros = speciesMaps[Species.Fox];
         //Lista de zorros a la vista
         List<LivingEntity> zorrosVisibles = mapaZorros.GetEntities(coord, Animal.maxViewDistance);
         if (zorrosVisibles.Count > 0) {
@@ -293,30 +289,30 @@ public class Environment : MonoBehaviour {
             //print("Numero de zorros visibles: " + zorrosVisibles.Count);
             for (int i = 0; i < zorrosVisibles.Count; i++) {
                 //zorrosVisibles[indiceMasCercano] = zorrosVisibles[i];
-                if (Coord.Distance(zorrosVisibles[indiceMasCercano].coord, coord) <= Coord.Distance(zorrosVisibles[i].coord, coord) ) {
+                if (Vector3Int.Distance(zorrosVisibles[indiceMasCercano].coord, coord) <= Vector3Int.Distance(zorrosVisibles[i].coord, coord) ) {
                     indiceMasCercano = i;
                 }
             }
             return zorrosVisibles[indiceMasCercano].coord;
         }
         else {
-            return new Coord(0,0);
+            return new Vector3Int(0,0);
         }*/
     }
 
     ///<summary> Dadas unas coordenadas, devuelve todo la planta y agua mas cercanos </summary>
-    public static Surroundings Sense (Coord coord, int viewDistance) {
-        var closestPlant = speciesMaps[Species.Plant].ClosestEntity (coord, viewDistance);
+    public static Surroundings Sense (Vector3Int coord, int viewDistance) {
+        var closestPlant = speciesMaps[Species.Plant].EntidadMascercana(coord, viewDistance);
         var surroundings = new Surroundings ();
         surroundings.nearestFoodSource = closestPlant;
-        surroundings.nearestWaterTile = closestVisibleWaterMap[coord.x, coord.y];
+        surroundings.nearestWaterTile = closestVisibleWaterMap[coord.x, coord.z];
 
         return surroundings;
     }
 
     ///<summary>Dadas unas coordenadas, devuelve la siguiente tile donde se pueda caminar</summary>
-    public static Coord GetNextTileRandom (Coord current) {
-        var neighbours = walkableNeighboursMap[current.x, current.y];
+    public static Vector3Int GetNextTileRandom (Vector3Int current) {
+        var neighbours = walkableNeighboursMap[current.x, current.z];
         if (neighbours.Length == 0) {
             return current;
         }
@@ -324,43 +320,49 @@ public class Environment : MonoBehaviour {
     }
 
     /// Get random neighbour tile, weighted towards those in similar direction as currently facing
-    public static Coord GetNextTileWeighted (Coord current, Coord previous, double forwardProbability = 0.2, int weightingIterations = 3) {
-
+    public static Vector3Int GetNextTileWeighted (Vector3Int current, Vector3Int previous, double forwardProbability = 0.2, int weightingIterations = 3) {
+        //NOTA: COMO HEMOS CAMBIADO COORD A VECTOR3INT TODO LO QUE ANTES AQUI ERA Y AHORA ES LA Z
         if (current == previous) {
-
             return GetNextTileRandom (current);
         }
 
-        Coord forwardOffset = (current - previous);
+        Vector3Int forwardOffset = (current - previous);
         // Random chance of returning foward tile (if walkable)
         if (prng.NextDouble () < forwardProbability) {
-            Coord forwardCoord = current + forwardOffset;
+            Vector3Int forwardCoord = current + forwardOffset;
             //Comprobamos que sea una coordenada valida
-            if (forwardCoord.x >= 0 && forwardCoord.x < size && forwardCoord.y >= 0 && forwardCoord.y < size) {
-                if (walkable[forwardCoord.x, forwardCoord.y]) {
+            if (forwardCoord.x >= 0 && forwardCoord.x < size && forwardCoord.z >= 0 && forwardCoord.z < size) {
+                if (walkable[forwardCoord.x, forwardCoord.z]) {
                     return forwardCoord;
                 }
             }
         }
 
         // Get walkable neighbours
-        var neighbours = walkableNeighboursMap[current.x, current.y];
-        if (neighbours.Length == 0) {
-            return current;
+        var neighbours = walkableNeighboursMap[current.x, current.z];
+        if(neighbours != null){
+            if (neighbours.Length == 0) {
+                return current;
+            }
+        }
+        else{
+            print("Neighbours ha dado null");
         }
 
         // From n random tiles, pick the one that is most aligned with the forward direction:
-        Vector2 forwardDir = new Vector2 (forwardOffset.x, forwardOffset.y).normalized;
+        Vector2 forwardDir = new Vector2 (forwardOffset.x, forwardOffset.z).normalized;
         float bestScore = float.MinValue;
-        Coord bestNeighbour = current;
+        Vector3Int bestNeighbour = current;
 
-        for (int i = 0; i < weightingIterations; i++) {
-            Coord neighbour = neighbours[prng.Next (neighbours.Length)];
-            Vector2 offset = neighbour - current;
-            float score = Vector2.Dot (offset.normalized, forwardDir);
-            if (score > bestScore) {
-                bestScore = score;
-                bestNeighbour = neighbour;
+        if(neighbours!=null){
+            for (int i = 0; i < weightingIterations; i++) {
+                Vector3Int neighbour = neighbours[prng.Next (neighbours.Length)];
+                Vector2 offset = new Vector2(neighbour.x - current.x, neighbour.z - current.z);
+                float score = Vector2.Dot (offset.normalized, forwardDir);
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestNeighbour = neighbour;
+                }
             }
         }
 
@@ -391,10 +393,10 @@ public class Environment : MonoBehaviour {
         predatorsBySpecies = new Dictionary<Species, List<Species>> ();
 
         // Init species maps
-        speciesMaps = new Dictionary<Species, Map> ();
+        speciesMaps = new Dictionary<Species, Mapa> ();
         for (int i = 0; i < numSpecies; i++) {
             Species species = (Species) (1 << i);
-            speciesMaps.Add (species, new Map (size, mapRegionSize));
+            speciesMaps.Add (species, new Mapa (size, mapRegionSize));
 
             preyBySpecies.Add (species, new List<Species> ());
             predatorsBySpecies.Add (species, new List<Species> ());
@@ -423,13 +425,13 @@ public class Environment : MonoBehaviour {
 
         SpawnTrees ();
 
-        walkableNeighboursMap = new Coord[size, size][];
+        walkableNeighboursMap = new Vector3Int[size, size][];
 
         // Find and store all walkable neighbours for each walkable tile on the map
         for (int y = 0; y < terrainData.size; y++) {
             for (int x = 0; x < terrainData.size; x++) {
                 if (walkable[x, y]) {
-                    List<Coord> walkableNeighbours = new List<Coord> ();
+                    List<Vector3Int> walkableNeighbours = new List<Vector3Int> ();
                     for (int offsetY = -1; offsetY <= 1; offsetY++) {
                         for (int offsetX = -1; offsetX <= 1; offsetX++) {
                             if (offsetX != 0 || offsetY != 0) {
@@ -437,7 +439,8 @@ public class Environment : MonoBehaviour {
                                 int neighbourY = y + offsetY;
                                 if (neighbourX >= 0 && neighbourX < size && neighbourY >= 0 && neighbourY < size) {
                                     if (walkable[neighbourX, neighbourY]) {
-                                        walkableNeighbours.Add (new Coord (neighbourX, neighbourY));
+                                        //print("WalkableNeighbour añadido");
+                                        walkableNeighbours.Add (new Vector3Int (neighbourX, 0, neighbourY));
                                     }
                                 }
                             }
@@ -465,8 +468,9 @@ public class Environment : MonoBehaviour {
         viewOffsets.Sort ((a, b) => (a.x * a.x + a.y * a.y).CompareTo (b.x * b.x + b.y * b.y));
         Coord[] viewOffsetsArr = viewOffsets.ToArray ();
 
+        int nWT = 0;
         // Find closest accessible water tile for each tile on the map:
-        closestVisibleWaterMap = new Coord[size, size];
+        closestVisibleWaterMap = new Vector3Int[size, size];
         for (int y = 0; y < terrainData.size; y++) {
             for (int x = 0; x < terrainData.size; x++) {
                 bool foundWater = false;
@@ -477,7 +481,7 @@ public class Environment : MonoBehaviour {
                         if (targetX >= 0 && targetX < size && targetY >= 0 && targetY < size) {
                             if (terrainData.shore[targetX, targetY]) {
                                 if (EnvironmentUtility.TileIsVisibile (x, y, targetX, targetY)) {
-                                    closestVisibleWaterMap[x, y] = new Coord (targetX, targetY);
+                                    closestVisibleWaterMap[x, y] = new Vector3Int (targetX, 0, targetY);
                                     foundWater = true;
                                     break;
                                 }
@@ -486,10 +490,12 @@ public class Environment : MonoBehaviour {
                     }
                 }
                 if (!foundWater) {
-                    closestVisibleWaterMap[x, y] = Coord.invalid;
+                    nWT++;
+                    closestVisibleWaterMap[x, y] = invalid;
                 }
             }
         }
+        print("Numero de water tiles no encontrados: " + nWT);
         Debug.Log ("Init time: " + sw.ElapsedMilliseconds);
     }
 
@@ -502,7 +508,7 @@ public class Environment : MonoBehaviour {
 
         var spawnPrng = new System.Random (seed);
         var treeHolder = new GameObject ("Tree holder").transform;
-        walkableCoords = new List<Coord> ();
+        walkableCoords = new List<Vector3Int> ();
 
         for (int y = 0; y < terrainData.size; y++) {
             for (int x = 0; x < terrainData.size; x++) {
@@ -530,7 +536,7 @@ public class Environment : MonoBehaviour {
                         // Mark tile unwalkable
                         walkable[x, y] = false;
                     } else {
-                        walkableCoords.Add (new Coord (x, y));
+                        walkableCoords.Add (new Vector3Int (x, 0, y));
                     }
                 }
             }
@@ -542,7 +548,7 @@ public class Environment : MonoBehaviour {
         //Numero aleatorio en funcion de la seed
         var spawnPrng = new System.Random (seed);
         //Lista de coordenadas spawneables, haya donde se pueda andar
-        var spawnCoords = new List<Coord> (walkableCoords);
+        var spawnCoords = new List<Vector3Int> (walkableCoords);
 
         //Loop para spawnear los agentes
         //Loop para cada tipo de animal
@@ -556,7 +562,7 @@ public class Environment : MonoBehaviour {
                 }
                 //Coordenada random
                 int spawnCoordIndex = spawnPrng.Next (0, spawnCoords.Count);
-                Coord coord = spawnCoords[spawnCoordIndex];
+                Vector3Int coord = spawnCoords[spawnCoordIndex];
                 spawnCoords.RemoveAt (spawnCoordIndex);
 
                 SpawnLivingEntity(pop.prefab, coord);
@@ -573,10 +579,10 @@ public class Environment : MonoBehaviour {
 
     //Spawn normal
     ///<summary>Dada una entidad y una coordenada, las spawnea</summary>
-    public void SpawnLivingEntity(LivingEntity prefab, Coord pos){
+    public void SpawnLivingEntity(LivingEntity prefab, Vector3Int pos){
         var ent = Instantiate(prefab);
         ent.Init(pos);
-        speciesMaps[ent.species].Add(ent, pos);
+        speciesMaps[ent.species].Añadir(ent, pos);
         if(ent.species == Species.Fox){
             ent.transform.parent = foxHolder.transform;
         }
@@ -597,8 +603,8 @@ public class Environment : MonoBehaviour {
 
     //Spawn de reproduccion sexual. Es la funcion a la que se llama desde Animal
     ///<summary>Dada una entidad, una coordenada y padre y madre, spawnea un hijo a traves de la reproduccion sexual</summary>
-    //public static LivingEntity SpawnLivingEntitySR(LivingEntity prefab, Coord pos, Animal fath, Animal moth){
-    public static LivingEntity SpawnLivingEntitySR(LivingEntity prefab, Coord pos, Animal.Padres fath, Animal.Padres moth){
+    //public static LivingEntity SpawnLivingEntitySR(LivingEntity prefab, Vector3Int pos, Animal fath, Animal moth){
+    public static LivingEntity SpawnLivingEntitySR(LivingEntity prefab, Vector3Int pos, Animal.Padres fath, Animal.Padres moth){
         var ent = Instantiate(prefab);
         ( (Animal) ent).fatherVals = fath;
         ( (Animal) ent).motherVals = moth;
@@ -608,7 +614,7 @@ public class Environment : MonoBehaviour {
 
         ent.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
         ent.Init(pos);
-        speciesMaps[ent.species].Add(ent, pos);
+        speciesMaps[ent.species].Añadir(ent, pos);
 
         var foxHolderAux = GameObject.Find("FoxHolder");
         var rabbitHolderAux = GameObject.Find("RabbitHolder");
@@ -729,8 +735,9 @@ public class Environment : MonoBehaviour {
         var colorAux = Color.cyan;colorAux.a = 0.05f;
         Gizmos.color = colorAux;var b = speciesMaps[Species.Rabbit];
         foreach (var m in speciesMaps){
-            foreach (var x in m.Value.centres) {
-                Gizmos.DrawCube(new Vector3(x.x, 0, x.y), new Vector3(m.Value.regionSize, m.Value.regionSize, m.Value.regionSize));
+            foreach (var x in m.Value.centros) {
+                Gizmos.DrawSphere(new Vector3(x.x, 0, x.z), 0.1f);
+                Gizmos.DrawCube(new Vector3(x.x, 0, x.z), new Vector3(m.Value.tamañoRegion, m.Value.tamañoRegion, m.Value.tamañoRegion));
             } 
         }
     }

@@ -65,19 +65,19 @@ public class Animal : LivingEntity {
     public List<Animal> hembrasNoImpresionadas;
 
     protected LivingEntity foodTarget;
-    protected Coord waterTarget;
+    protected Vector3Int waterTarget;
 
     // Move data:
     protected bool animatingMovement;
-    Coord moveFromCoord;
-    Coord moveTargetCoord;
+    Vector3Int moveFromCoord;
+    Vector3Int moveTargetCoord;
     Vector3 moveStartPos;
     Vector3 moveTargetPos;
     float moveTime;
     float moveSpeedFactor;
     float moveArcHeightFactor;
     //Array de coordenadas que es el camino que va a coger el agente
-    protected Coord[] path;
+    public Vector3Int[] path;
     int pathIndex;
 
     // Other
@@ -162,7 +162,7 @@ public class Animal : LivingEntity {
     }
 
     ///<summary>Inicializamos el color y los genes</summary>
-    public override void Init (Coord coord) {
+    public override void Init (Vector3Int coord) {
         env = (Environment) GameObject.Find("Environment").GetComponent("Environment");
         base.Init (coord);
         moveFromCoord = coord;
@@ -306,7 +306,7 @@ public class Animal : LivingEntity {
         // Get info about surroundings
 
         // Decide next action:
-        Coord coordDepredadorCercano = Environment.SenseDepredador(species, coord, maxViewDistance);
+        Vector3Int coordDepredadorCercano = Environment.SenseDepredador(species, coord, maxViewDistance);
         //NOTA: Cambiar el species!=Species.Fox porque en el futuro puede que haya más animales. Cambiarlo a buscar en el diccionario de depredadores
         if (coordDepredadorCercano.x+coordDepredadorCercano.y != 0 && species != Species.Fox) {
             HuirDepredador(coordDepredadorCercano);
@@ -359,9 +359,9 @@ public class Animal : LivingEntity {
     }*/
 
     //Ordena una lista de animales en funcion de quien esta mas cerca de la coordenada dada
-    List<Animal> OrdenarListaAnimales(List<Animal> lista, Coord origen){
+    List<Animal> OrdenarListaAnimales(List<Animal> lista, Vector3Int origen){
         var aux = lista;
-        aux.Sort((a,b) => (Coord.Distance(a.coord,origen)).CompareTo(Coord.Distance(b.coord,origen)));
+        aux.Sort((a,b) => (Vector3Int.Distance(a.coord,origen)).CompareTo(Vector3Int.Distance(b.coord,origen)));
         return aux;
     }
 
@@ -378,7 +378,8 @@ public class Animal : LivingEntity {
         currentAction = CreatureAction.SearchingForMate;
         potentialMates = OrdenarListaAnimales(potentialMates, coord);
         if(potentialMates.Count > 0) {
-            CreatePath(potentialMates[0].coord);
+            if(EnvironmentUtility.TileIsVisibile(coord.x, coord.z, potentialMates[0].coord.x, potentialMates[0].coord.z))
+                CreatePath(potentialMates[0].coord);
         }
     }
 
@@ -402,9 +403,9 @@ public class Animal : LivingEntity {
 
     protected void FindWater () {
         //Encontramos la tile de agua mas cercana
-        Coord waterTile = Environment.SenseWater (coord, maxViewDistance);
+        Vector3Int waterTile = Environment.SenseWater (coord, maxViewDistance);
         //Si la coordenada es valida, vamos ahi
-        if (waterTile != Coord.invalid) {
+        if (waterTile != Environment.invalid) {
             currentAction = CreatureAction.GoingToWater;
             waterTarget = waterTile;
             CreatePath (waterTarget);
@@ -420,7 +421,7 @@ public class Animal : LivingEntity {
         //Tambien tenemos en cuenta que el animal sea lento. NOTA: En el futuro deberia de tener en cuenta el valor nutricional, la deseabilidad y asi tambien
         //PROBLEMA: Por algun motivo no deja la llamada (Animal)food. Sera por algo de copias de instancias¿?¿?¿?¿?
         //int velocidad = (int) (((Animal)food).moveSpeed / ((Animal) self).moveSpeed );
-        return Coord.SqrDistance (self.coord, food.coord);
+        return (int)Vector3Int.Distance(self.coord, food.coord);
     }
 
     ///<summary>Dado un animal, devuelve la estructura Padres con los valores inicializados</summary>
@@ -465,6 +466,12 @@ public class Animal : LivingEntity {
         }
     }
 
+    //PERO VAMOS A VER, TONTOSHEISSE. (10,2) Y (11,2) ESTAN A DISTANCIA 1 Y SIN EMBARGO SON VECINOS. RAIZ DE 2 ES SI ES UN VECINO DIAGONAL
+    protected bool CoordenadasVecinas(Vector3Int a, Vector3Int b){
+        //NOTA: SI SON VECINOS LA DISTANCIA DE LAS POSICIONES NO ES 1, ES RAIZ DE 2, TONTO DEL CULO
+        return Vector3Int.Distance(a,b)<=Math.Sqrt(2);
+    }
+
     //Controla y ejecuta la accion que desea hacer el agente
     protected void Act () {
         switch (currentAction) {
@@ -472,25 +479,28 @@ public class Animal : LivingEntity {
                 StartMoveToCoord (Environment.GetNextTileWeighted (coord, moveFromCoord));
                 break;
             case CreatureAction.GoingToFood:
-                if (Coord.AreNeighbours (coord, foodTarget.coord)) {
+                if (CoordenadasVecinas(coord, foodTarget.coord)) {
                     LookAt (foodTarget.coord);
                     currentAction = CreatureAction.Eating;
-                } else {
-                    StartMoveToCoord (path[pathIndex]);
-                    pathIndex++;
+                } else if(path!=null){
+                    if(path.Length > pathIndex){
+                        StartMoveToCoord (path[pathIndex]);
+                        pathIndex++;
+                    }
                 }
                 break;
             case CreatureAction.GoingToWater:
-                if (Coord.AreNeighbours (coord, waterTarget)) {
+                if (CoordenadasVecinas(coord, waterTarget)) {
                     LookAt (waterTarget);
                     currentAction = CreatureAction.Drinking;
-                } else {
-                    StartMoveToCoord (path[pathIndex]);
-                    pathIndex++;
+                } else if(path!=null) {
+                    if(path.Length > pathIndex){
+                        StartMoveToCoord (path[pathIndex]);
+                        pathIndex++;
+                    }
                 }
                 break;
             case CreatureAction.Fleeing:
-                print("Estamos huyendo");
                 //Solo los conejos huyen, asi que nunca deberia de petar porque aqui no entraran los zorros
                 LookAt(base.coord + (base.coord - ((Rabbit)this).depredadorMasCercano));
                 //StartMoveToCoord(base.coord - (base.coord - depredadorMasCercano));
@@ -499,15 +509,18 @@ public class Animal : LivingEntity {
                     //Debug.Log("No hay escapatoria :(");
                 }
                 else{
-                StartMoveToCoord(path[pathIndex]);
-                pathIndex++;
+                    //NOTA: ESTO ES KK ES UNA COMPROBACION QUE NO DEBERIA DE HACER FALTA
+                    if(path.Length > pathIndex){
+                        StartMoveToCoord(path[pathIndex]);
+                        pathIndex++;
+                    }
                 }
                 //print("Estoy huyendo");
             break;
             case CreatureAction.SearchingForMate:
                 if (potentialMates.Count > 0) {
                     //Si estamos junto al potentialMate
-                    if (Coord.AreNeighbours (coord, potentialMates[0].coord)) {
+                    if (CoordenadasVecinas(coord, potentialMates[0].coord)) {
                         //Si somos macho, solicitamos la reproduccion que sera en funcion de la deseabilidad
                         //NOTA: Solo importa el SolicitarMating del macho, el de la hembra siempre se acepta porque los machos siempre aceptan
                         if(genes.isMale && potentialMates[0].SolicitarMating(this)) {
@@ -526,9 +539,11 @@ public class Animal : LivingEntity {
                         }
                     }
                     else {
-                        LookAt(potentialMates[0].coord);
-                        StartMoveToCoord(path[pathIndex]);
-                        pathIndex++;
+                        if(path != null && pathIndex < path.Length){
+                            LookAt(potentialMates[0].coord);
+                            StartMoveToCoord(path[pathIndex]);
+                            pathIndex++;
+                        }
                     }
                 }
                 else {
@@ -538,8 +553,26 @@ public class Animal : LivingEntity {
         }
     }
 
+    //Dado un vector3Int. Si sus componentes estan fuera del mapa del mundo, devuelve con los componentes en los maximos del mapa
+    private Vector3Int ReducirDimensionesOverflow(Vector3Int target){
+        //print("Direccion original: " + target);
+        var aux = target;
+        if(target.x >= Environment.tileCentres.GetLength(0))
+            aux.x = Environment.tileCentres.GetLength(0)-1;
+        if(target.x < 0)
+            aux.x = 0;
+        if(target.z >= Environment.tileCentres.GetLength(1))
+            aux.z = Environment.tileCentres.GetLength(1)-1;
+        if(target.z < 0)
+            aux.z = 0;
+        //print("Direccion despues de procesar el overflow: " + aux);
+        return aux;
+    }
+
     //Camino mas cercano al target
-    protected void CreatePath (Coord target) {
+    protected void CreatePath (Vector3Int target) {
+        //Si target es fuera del mapa, devolvemos el limite del mapa
+        target = ReducirDimensionesOverflow(target);
         //NOTA: Cuidado, cuando pathIndex vale 0 da error en el if en path[pathIndex - 1] porque esta pidiendo path[-1]
         //por eso esta el primer if pero seguro que hay una manera mas elegante de hacerlo
         // Create new path if current is not already going to target
@@ -548,27 +581,41 @@ public class Animal : LivingEntity {
             //if (path == null || pathIndex >= path.Length) {
                 //NOTA: Falla al buscar path en coordenadas no validas (agua o fin del mapa)
                 //puede que haya que mejorar el PathFinder
-                path = EnvironmentUtility.GetPath (coord.x, coord.y, target.x, target.y);
+                //path = Pathfinder.BresenhamError(coord.x, coord.z, target.x, target.z);
+                path = ListaCoordAListaVector3(EnvironmentUtility.GetPath(coord.x, coord.z, target.x, target.z));
                 pathIndex = 0;
-                //if(currentAction == CreatureAction.Fleeing){
-                //print("Path creado para huir");}
             }
         }
         else{
-            path = EnvironmentUtility.GetPath(coord.x, coord.y, target.x, target.y);
+            //path = Pathfinder.BresenhamError(coord.x, coord.z, target.x, target.z);
+            path = ListaCoordAListaVector3(EnvironmentUtility.GetPath(coord.x, coord.z, target.x, target.z));
             pathIndex = 0;
         }
     }
 
+    private Vector3Int[] ListaCoordAListaVector3(Coord[] lista){
+        if(lista != null){
+            Vector3Int[] res = new Vector3Int[lista.Length];
+            for (int i = 0; i < lista.Length; i++){
+                res[i] = new Vector3Int(lista[i].x, 0, lista[i].y);
+            }
+            return res;
+        }
+        else{
+            return null;
+        }
+    }
+
     /// <summary>Dadas las coordenadas objetivo, empezamos a movernos ahi</summary>
-    protected void StartMoveToCoord (Coord target) {
+    protected void StartMoveToCoord (Vector3Int target) {
         moveFromCoord = coord;
         moveTargetCoord = target;
         moveStartPos = transform.position;
-        moveTargetPos = Environment.tileCentres[moveTargetCoord.x, moveTargetCoord.y];
+        moveTargetPos = Environment.tileCentres[moveTargetCoord.x, moveTargetCoord.z];
         animatingMovement = true;
 
-        bool diagonalMove = Coord.SqrDistance (moveFromCoord, moveTargetCoord) > 1;
+        //bool diagonalMove = Coord.SqrDistance(moveFromCoord, moveTargetCoord)) > 1;
+        bool diagonalMove = Mathf.Sqrt(Vector3Int.Distance(moveFromCoord, moveTargetCoord)) > 1;
         moveArcHeightFactor = (diagonalMove) ? sqrtTwo : 1;
         moveSpeedFactor = (diagonalMove) ? oneOverSqrtTwo : 1;
 
@@ -576,11 +623,11 @@ public class Animal : LivingEntity {
     }
 
     //Miramos en direccion al target
-    protected void LookAt (Coord target) {
+    protected void LookAt (Vector3Int target) {
         //Si no estamos ya en el target
         if (target != coord) {
-            Coord offset = target - coord;
-            transform.eulerAngles = Vector3.up * Mathf.Atan2 (offset.x, offset.y) * Mathf.Rad2Deg;
+            Vector3Int offset = target - coord;
+            transform.eulerAngles = Vector3.up * Mathf.Atan2 (offset.x, offset.z) * Mathf.Rad2Deg;
         }
     }
 
@@ -590,7 +637,7 @@ public class Animal : LivingEntity {
             if (foodTarget && hunger > 0) {
                 //NOTA: Cambiar porque ahora solo funciona porque esta hecho a mano
                 //Nos comemos un conejo
-                if((foodTarget.species).ToString() ==  "Rabbit"){
+                if( foodTarget.species ==  Species.Rabbit){
                     //print("Valor nutricional:" + ((Rabbit) ((Animal) foodTarget) ).valorNutricional);
                     //hunger -= ((Rabbit) ((Animal) foodTarget) ).valorNutricional;
                     hunger -= ((Rabbit) ((Animal) foodTarget) ).valorNutricional;
@@ -607,7 +654,8 @@ public class Animal : LivingEntity {
                     hunger -= eatAmount;
                 }
             }
-        } else if (currentAction == CreatureAction.Drinking) {
+        }
+        else if (currentAction == CreatureAction.Drinking) {
             if (thirst > 0) {
                 thirst -= Time.deltaTime * 1 / drinkDuration;
                 thirst = Mathf.Clamp01 (thirst);

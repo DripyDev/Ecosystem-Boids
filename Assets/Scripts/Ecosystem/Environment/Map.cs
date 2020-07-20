@@ -44,7 +44,7 @@ public class Map {
             //Numero de animales por region
             for (int j = 0; j < map[regionCoord.x, regionCoord.y].Count; j++) {
                 LivingEntity entity = map[regionCoord.x, regionCoord.y][j];
-                float sqrDst = Coord.SqrDistance (entity.coord, origin);
+                float sqrDst = Coord.SqrDistance (VectorACoord(entity.coord), origin);
                 if (sqrDst < sqrViewDst) {
                     if (EnvironmentUtility.TileIsVisibile (origin.x, origin.y, entity.coord.x, entity.coord.y)) {
                         visibleEntities.Add (entity);
@@ -53,6 +53,11 @@ public class Map {
             }
         }
         return visibleEntities;
+    }
+
+    //Funcion temporal para que deje de dar la kk el compilador. En el futuro toda esta clase deberia de ser eliminada
+    private Coord VectorACoord(Vector3Int pos){
+        return new Coord(pos.x, pos.z);
     }
 
     public LivingEntity ClosestEntity (Coord origin, float viewDistance) {
@@ -71,7 +76,7 @@ public class Map {
 
             for (int j = 0; j < map[regionCoord.x, regionCoord.y].Count; j++) {
                 LivingEntity entity = map[regionCoord.x, regionCoord.y][j];
-                float sqrDst = Coord.SqrDistance (entity.coord, origin);
+                float sqrDst = Coord.SqrDistance (VectorACoord(entity.coord), origin);
                 if (sqrDst < closestSqrDst) {
                     if (EnvironmentUtility.TileIsVisibile (origin.x, origin.y, entity.coord.x, entity.coord.y)) {
                         closestSqrDst = sqrDst;
@@ -126,7 +131,7 @@ public class Map {
         int index = map[regionX, regionY].Count;
         // store the entity's index in the list inside the entity itself for quick access
         e.mapIndex = index;
-        e.mapCoord = coord;
+        e.mapCoord = new Vector2Int(coord.x,coord.y);
         map[regionX, regionY].Add (e);
         numEntities++;
     }

@@ -74,6 +74,9 @@ public static class EnvironmentUtility {
 
         // Is neighbouring tile
         if (absW <= 1 && absH <= 1) {
+            /*var aux = new Coord[1]; aux[0] = new Coord(x,y);
+            Debug.Log("Devolvemos aux");
+            return aux;*/
             return null;
         }
 
@@ -119,9 +122,11 @@ public static class EnvironmentUtility {
                 y += dy2;
             }
             try{
+                //NOTA: EN ESTE CASO NO DEVUELVE NADA SI, POR EJEMPLO, HAY UN ARBOL EN EL PATH. ESO NO ES CORRECTO
                 // If not walkable, path is invalid so return null
                 // (unless is target tile, which may be unwalkable e.g water)
                 if (i != longest && !Environment.walkable[x, y]) {
+                    Debug.Log("Devolvemos null en pathfinder");
                     return null;
                 }
                 path[i - 1] = new Coord (x, y);
