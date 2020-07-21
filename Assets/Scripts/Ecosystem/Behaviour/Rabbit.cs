@@ -14,7 +14,7 @@ public class Rabbit : Animal {
     private static Vector3Int cero = new Vector3Int(0,0,0);
     void Start() {
         var aux = new System.Random();
-        valorNutricional = Mathf.Max((float) (aux.Next(60)/100), 0.3f);
+        valorNutricional = Mathf.Max( (aux.Next(60)/100f), 0.3f);
     }
     
     public void Update() {
@@ -66,10 +66,11 @@ public class Rabbit : Animal {
         // Get info about surroundings
 
         // Decide next action:
-        Vector3Int coordDepredadorCercano = Environment.SenseDepredador(species, coord, maxViewDistance);
+        var aux = Mundo.SentirDepredador(this, maxViewDistance);
+        depredadorMasCercano = aux==null? cero:(aux).coord;
         //NOTA: Cambiar el species!=Species.Fox porque en el futuro puede que haya más animales. Cambiarlo a buscar en el diccionario de depredadores
-        if (coordDepredadorCercano.x+coordDepredadorCercano.z != 0 && species != Species.Fox) {
-            HuirDepredador(coordDepredadorCercano);
+        if (depredadorMasCercano != cero && species != Species.Fox) {
+            HuirDepredador(depredadorMasCercano);
         }
         //NOTA: Repasar cuando elige que accion
         else {
@@ -121,23 +122,23 @@ public class Rabbit : Animal {
         Gizmos.color = auxcolor;
         Gizmos.DrawSphere(transform.position, maxViewDistance);*/
         if (Application.isPlaying) {
-            var surroundings = Environment.Sense (coord, maxViewDistance);
+            //var surroundings = Environment.Sense(coord, maxViewDistance);
             var auxcolor = Color.yellow;
             auxcolor.a = 0.1f;
             Gizmos.color = auxcolor;
             Gizmos.DrawSphere(transform.position, maxViewDistance);
             Gizmos.color = Color.white;
-            if (surroundings.nearestFoodSource != null) {
+            /*if (surroundings.nearestFoodSource != null) {
                 Gizmos.DrawLine (transform.position, surroundings.nearestFoodSource.transform.position);
             }
-            if (surroundings.nearestWaterTile != Environment.invalid) {
+            if (surroundings.nearestWaterTile != Mundo.invalid) {
                 Gizmos.color = Color.blue; 
-                Gizmos.DrawLine (transform.position, Environment.tileCentres[surroundings.nearestWaterTile.x, surroundings.nearestWaterTile.z]);
-            }
+                Gizmos.DrawLine (transform.position, Mundo.centros[surroundings.nearestWaterTile.x, surroundings.nearestWaterTile.z]);
+            }*/
             if(path != null){
                 Gizmos.color = Color.green;
                 for (int i = 0; i < path.Length; i++) {
-                    Gizmos.DrawSphere (Environment.tileCentres[path[i].x, path[i].z], .2f);
+                    Gizmos.DrawSphere (Mundo.centros[path[i].x, path[i].z], .2f);
                 }
             }
             if(depredadorMasCercano != new Vector3(0,0,0)){
@@ -148,7 +149,7 @@ public class Rabbit : Animal {
                 //var path = EnvironmentUtility.GetPath (coord.x, coord.y, foodTarget.coord.x, foodTarget.coord.y);
                 Gizmos.color = Color.black;
                 for (int i = 0; i < path.Length; i++) {
-                    Gizmos.DrawSphere (Environment.tileCentres[path[i].x, path[i].z], .2f);
+                    Gizmos.DrawSphere (Mundo.centros[path[i].x, path[i].z], .2f);
                 }
             }
         }

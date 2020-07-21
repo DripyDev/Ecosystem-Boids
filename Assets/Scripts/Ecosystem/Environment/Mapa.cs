@@ -50,7 +50,7 @@ public class Mapa {
         return lista;
     }
 
-    ///<summary>Devuelve la entidad mas cercana a nosotros</summary>
+    ///<summary>Devuelve la entidad mas cercana a nosotros dentro del rango de vision dado</summary>
     public LivingEntity EntidadMascercana(Vector3Int origen, float distanciaVision){
         var lista = ObtenerEntidades(origen, distanciaVision);
         //lista.Sort( (a,b) => Coord.Distance(origen, a.coord).CompareTo(Coord.Distance(origen, b.coord)) );

@@ -6,7 +6,7 @@ using System.IO;
 
 public class GVision : MonoBehaviour
 {
-    public Environment environment;
+    public Mundo environment;
     public SimplestPlot.PlotType PlotExample = SimplestPlot.PlotType.TimeSeries;
     //Numero de puntos de la grafica a calcular
     //private int DataPoints = 300;

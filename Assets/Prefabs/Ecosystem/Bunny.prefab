@@ -50,13 +50,9 @@ MonoBehaviour:
   colourMaterialIndex: 2
   species: 4
   material: {fileID: 2100000, guid: 2c423ba3ec69b4461a99ca939a93b4ac, type: 2}
-  coord:
-    x: 66
-    y: 2
+  coord: {x: 66, y: 2, z: 0}
   mapIndex: 0
-  mapCoord:
-    x: 0
-    y: 0
+  mapCoord: {x: 0, y: 0}
   cria: 0
   maxViewDistance: 10
   diet: 2
@@ -78,7 +74,9 @@ MonoBehaviour:
   potentialMates: []
   machosRechazados: []
   hembrasNoImpresionadas: []
+  path: []
   valorNutricional: 0
+  depredadorMasCercano: {x: 0, y: 0, z: 0}
 --- !u!114 &3874918950189636065
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -94,13 +92,9 @@ MonoBehaviour:
   colourMaterialIndex: 2
   species: 4
   material: {fileID: 2100000, guid: 2c423ba3ec69b4461a99ca939a93b4ac, type: 2}
-  coord:
-    x: 66
-    y: 2
+  coord: {x: 66, y: 2, z: 0}
   mapIndex: 0
-  mapCoord:
-    x: 0
-    y: 0
+  mapCoord: {x: 0, y: 0}
   cria: 0
   maxViewDistance: 10
   diet: 2
@@ -122,6 +116,7 @@ MonoBehaviour:
   potentialMates: []
   machosRechazados: []
   hembrasNoImpresionadas: []
+  path: []
 --- !u!65 &-3800553892912618399
 BoxCollider:
   m_ObjectHideFlags: 0

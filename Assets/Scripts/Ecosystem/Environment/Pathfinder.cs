@@ -45,10 +45,10 @@ public static class Pathfinder {
         var err = dx+dy;
         while(true){
             //Nos hemos pasado y algo ha fallado, devolvemos null
-            if(x > Environment.walkable.GetLength(0)-1 || y > Environment.walkable.GetLength(1)-1)
+            if(x > Mundo.caminable.GetLength(0)-1 || y > Mundo.caminable.GetLength(1)-1)
                 return null;
             //Si la seccion no es caminable pero no somos vecinos del objetivo intentamos bordear
-            if(!Environment.walkable[x,y] && x != xOriginal && y != yOriginal){
+            if(!Mundo.caminable[x,y] && x != xOriginal && y != yOriginal){
                 //NOTA: DE MOMENTO DEVOLVEMOS NULL, EN EL FUTURO INTENTAR BORDEAR O ALGO
                 //Debug.Log("El camino es unwalkable");
                 return null;
@@ -87,7 +87,7 @@ public static class Pathfinder {
         var sy = y < y1? 1:-1;
         while(true){
             //El camino no es caminable. Path no valido
-            if(!Environment.walkable[x,y] && Math.Abs(x1-x) != 0 && Math.Abs(y1-y) != 0)
+            if(!Mundo.caminable[x,y] && Math.Abs(x1-x) != 0 && Math.Abs(y1-y) != 0)
                 return null;
             pathAux.Add(new Vector3Int(x, 0, y));
             //if(x==x1 && y==y1)
@@ -118,7 +118,7 @@ public static class Pathfinder {
         var err = dx+dy;
         while(true){
             //Si hay una parte no caminable, el tile no es visible
-            if(!Environment.walkable[x,y]){
+            if(!Mundo.caminable[x,y]){
                 return false;
             }
             //Somos vecinos o el mismo, salimos

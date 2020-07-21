@@ -6,7 +6,8 @@ using System.IO;
 
 public class Example : MonoBehaviour
 {
-    public Environment environment;
+    //public Environment environment;
+    public Mundo environment;
     public SimplestPlot.PlotType PlotExample = SimplestPlot.PlotType.TimeSeries;
     //Activar para crear txt, sino no
     public bool crearTxt = true;

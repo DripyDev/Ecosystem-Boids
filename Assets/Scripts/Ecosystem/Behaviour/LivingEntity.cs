@@ -26,7 +26,7 @@ public class LivingEntity : MonoBehaviour {
     ///<summary>Inicializacion de la entidad en el mundo. guardamos su posicion y cargamos su material</summary>
     public virtual void Init (Vector3Int coord) {
         this.coord = coord;
-        transform.position = Environment.tileCentres[coord.x, coord.z];
+        transform.position = Mundo.centros[coord.x, coord.z];
 
         // Set material to the instance material
         var meshRenderer = transform.GetComponentInChildren<MeshRenderer> ();
@@ -78,7 +78,7 @@ public class LivingEntity : MonoBehaviour {
             }
             
             //Registramos la muerte
-            Environment.RegisterDeath (this, cause);
+            Mundo.RegistrarMuerte(this, cause);
             Destroy (gameObject);
         }
     }

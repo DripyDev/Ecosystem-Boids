@@ -6,7 +6,7 @@ using System.IO;
 
 public class GVelocidad : MonoBehaviour
 {
-    public Environment environment;
+    public Mundo mundo;
     public SimplestPlot.PlotType PlotExample = SimplestPlot.PlotType.TimeSeries;
     //Numero de puntos de la grafica a calcular
     //private int DataPoints = 300;
@@ -101,10 +101,10 @@ public class GVelocidad : MonoBehaviour
         tiempo.Add(Time.fixedTime/10f);
         if(especieGrafica == Species.Rabbit){
             //Si ya no hay zorros o conejos, matamos el proceso
-            if(environment.grafConejos[environment.grafConejos.Count - 1]<=0)
+            if(mundo.grafConejos[mundo.grafConejos.Count - 1]<=0)
                 this.enabled=false;
-            float media = (environment.velocidadConejos/environment.grafConejos[environment.grafConejos.Count - 1]);
-            //print("Sumatorio velocidad conejos: " + environment.velocidadConejos + " numero conejos: " + environment.grafConejos[environment.grafConejos.Count - 1]);
+            float media = (mundo.velocidadConejos/mundo.grafConejos[mundo.grafConejos.Count - 1]);
+            //print("Sumatorio velocidad conejos: " + mundo.velocidadConejos + " numero conejos: " + mundo.grafConejos[mundo.grafConejos.Count - 1]);
             //print("Velocidad media conejos: " + media );
             //Como es asincrono, a veces puede pasar que coja el sumatorio actualizado pero el numero sin actualizar.
             //la media NO puede ser menor a 1.5, si lo es, es problema de la sincronizacion y lo ignoramos
@@ -117,10 +117,10 @@ public class GVelocidad : MonoBehaviour
             }
         }
         if(especieGrafica == Species.Fox){
-            if(environment.grafZorros[environment.grafZorros.Count - 1]<=0)
+            if(mundo.grafZorros[mundo.grafZorros.Count - 1]<=0)
                 this.enabled=false;
-            float media = (environment.velocidadZorros/environment.grafZorros[environment.grafZorros.Count - 1]);
-            //print("Sumatorio velocidad zorros: " + environment.velocidadZorros + " numero zorros: " + environment.grafZorros[environment.grafZorros.Count - 1]);
+            float media = (mundo.velocidadZorros/mundo.grafZorros[mundo.grafZorros.Count - 1]);
+            //print("Sumatorio velocidad zorros: " + mundo.velocidadZorros + " numero zorros: " + mundo.grafZorros[mundo.grafZorros.Count - 1]);
             //print("Velocidad media zorros: " + media );
             //Como es asincrono, a veces puede pasar que coja el sumatorio actualizado pero el numero sin actualizar.
             //la media NO puede ser menor a 1.5, si lo es, es problema de la sincronizacion y lo ignoramos

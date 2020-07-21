@@ -179,7 +179,7 @@ public class Map {
         // Settings:
         bool showViewedRegions = true;
         bool showOccupancy = true;
-        float height = Environment.tileCentres[0, 0].y + 0.1f;
+        float height = Mundo.centros[0, 0].y + 0.1f;
         Gizmos.color = Color.black;
         Debug.Log("Estoy en gizmos de map");
         // Draw:

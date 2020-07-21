@@ -56,7 +56,7 @@ public class Fox : Animal{
         bool wellFed = hunger < criticalPercent/1.5;
         bool wellThirst = thirst < criticalPercent/1.5;
         //Si estamos bien alimentados podemos buscar pareja
-        if(wellFed && wellThirst && reproductiveUrge>0.3) {
+        if(wellFed && wellThirst && reproductiveUrge>0.4) {
             FindMate();
         }
         //Si no estamos bien alimentados, vamos a buscar comida o agua
@@ -80,20 +80,20 @@ public class Fox : Animal{
 
     void OnDrawGizmosSelected () {
         if (Application.isPlaying) {
-            var surroundings = Environment.Sense (coord, maxViewDistance);
+            //var surroundings = Environment.Sense (coord, maxViewDistance);
             var auxcolor = Color.yellow;
             auxcolor.a = 0.1f;
             Gizmos.color = auxcolor;
             Gizmos.DrawSphere(transform.position, maxViewDistance);
             Gizmos.color = Color.white;
-            if (surroundings.nearestWaterTile != Environment.invalid) {
-                Gizmos.DrawLine (transform.position, Environment.tileCentres[surroundings.nearestWaterTile.x, surroundings.nearestWaterTile.z]);
-            }
+            //if (surroundings.nearestWaterTile != Mundo.invalid) {
+            //    Gizmos.DrawLine (transform.position, Mundo.centros[surroundings.nearestWaterTile.x, surroundings.nearestWaterTile.z]);
+            //}
             if (currentAction == CreatureAction.GoingToFood && path != null) {
                 //var path = EnvironmentUtility.GetPath (coord.x, coord.y, foodTarget.coord.x, foodTarget.coord.y);
                 Gizmos.color = Color.black;
                 for (int i = 0; i < path.Length; i++) {
-                    Gizmos.DrawSphere (Environment.tileCentres[path[i].x, path[i].z], .2f);
+                    Gizmos.DrawSphere (Mundo.centros[path[i].x, path[i].z], .2f);
                 }
             }
         }

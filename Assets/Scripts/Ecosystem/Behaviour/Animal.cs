@@ -18,7 +18,8 @@ public class Animal : LivingEntity {
     public Color maleColour;
     public Color femaleColour;
     [HideInInspector]
-    public Environment env;
+    //public Environment env;
+    public Mundo env;
 
     // Settings:
     ///<summary>Tiempo minimo que tiene que pasar entre acciones
@@ -41,7 +42,7 @@ public class Animal : LivingEntity {
     ///<summary>Tiempo de animacion para la reproduccion. NO IMPLEMENTADO</summary>
     float matingDuration = 20;
     //Rango critico a partir del cual empiezan a buscar comida o agua
-    protected float criticalPercent = 0.7f;
+    protected float criticalPercent = 0.6f;
 
     // Visual settings:
     float moveArcHeight = .2f;
@@ -69,7 +70,7 @@ public class Animal : LivingEntity {
 
     // Move data:
     protected bool animatingMovement;
-    Vector3Int moveFromCoord;
+    public Vector3Int moveFromCoord;
     Vector3Int moveTargetCoord;
     Vector3 moveStartPos;
     Vector3 moveTargetPos;
@@ -163,7 +164,8 @@ public class Animal : LivingEntity {
 
     ///<summary>Inicializamos el color y los genes</summary>
     public override void Init (Vector3Int coord) {
-        env = (Environment) GameObject.Find("Environment").GetComponent("Environment");
+        //env = (Environment) GameObject.Find("Environment").GetComponent("Environment");
+        env = (Mundo) GameObject.Find("Environment").GetComponent("Mundo");
         base.Init (coord);
         moveFromCoord = coord;
 
@@ -237,12 +239,12 @@ public class Animal : LivingEntity {
                 tiempoParaParto = 0f;
                 embarazada = false;
                 motherVals = CrearPadres(this);
-                foreach (var population in env.initialPopulations) {
+                foreach (var population in env.poblacionInicial) {
                     if(population.prefab.species == species){
                         if(species == Species.Rabbit){
                             //Damos entre 4 y 13 hijos NOTA: Tendra que ir mas o menos en funcion del tiempo de embarazo
                             for (int i = 0; i < UnityEngine.Random.Range(4,13); i++){
-                                var hijo = Environment.SpawnLivingEntitySR(population.prefab, coord, fatherVals, motherVals);
+                                var hijo = Mundo.SpawnLivingEntitySR(population.prefab, coord, fatherVals, motherVals);
                                 //Cuanto mas tiempo de embarazo mas desarrollados salen los hijos. NOTA: Esto es kk, habra que cambiarlo
                                 ((Animal)hijo).edad += ratioTiempoEmbarazo==1f? 0.05f:0;
                             }
@@ -250,7 +252,7 @@ public class Animal : LivingEntity {
                         }
                         else{
                             for (int i = 0; i < UnityEngine.Random.Range(4,6); i++){
-                                var hijo = Environment.SpawnLivingEntitySR(population.prefab, coord, fatherVals, motherVals);
+                                var hijo = Mundo.SpawnLivingEntitySR(population.prefab, coord, fatherVals, motherVals);
                                 ((Animal)hijo).edad += ratioTiempoEmbarazo==1f? 0.05f:0;
                             }
                             break;
@@ -365,9 +367,17 @@ public class Animal : LivingEntity {
         return aux;
     }
 
+    private List<Animal> ListaLivingEntityAListaAnimal(List<LivingEntity> lista){
+        var listaAnimales = new List<Animal>();
+        foreach (var ser in lista){
+            listaAnimales.Add((Animal) ser);
+        }
+        return listaAnimales;
+    }
+
     ///<summary>Encontramos las posibles parejas (que no esten en las listas de excluidos) y creamos camino al mas cercano</summary>
     protected void FindMate(){
-        potentialMates = Environment.SensePotentialMates(coord, this);
+        potentialMates = ListaLivingEntityAListaAnimal(Mundo.SentirPosiblesParejas(this, coord, maxViewDistance));
         //Eliminamos los machos rechazados y hembras no impresionadas para no preguntarles todo el rato
         foreach (var machoRechazado in machosRechazados) {
             potentialMates.Remove(machoRechazado);
@@ -390,7 +400,7 @@ public class Animal : LivingEntity {
     /// </summary>
     protected void FindFood () {
         //Encontramos la entidad que sea fuente de comida mas cercana
-        LivingEntity foodSource = Environment.SenseFood (coord, this, FoodPreferencePenalty);
+        LivingEntity foodSource = Mundo.SentirComida(this, coord, maxViewDistance);
         if (foodSource) {
             currentAction = CreatureAction.GoingToFood;
             foodTarget = foodSource;
@@ -403,9 +413,9 @@ public class Animal : LivingEntity {
 
     protected void FindWater () {
         //Encontramos la tile de agua mas cercana
-        Vector3Int waterTile = Environment.SenseWater (coord, maxViewDistance);
+        Vector3Int waterTile = Mundo.SentirAgua(coord, maxViewDistance);
         //Si la coordenada es valida, vamos ahi
-        if (waterTile != Environment.invalid) {
+        if (waterTile != Mundo.invalid) {
             currentAction = CreatureAction.GoingToWater;
             waterTarget = waterTile;
             CreatePath (waterTarget);
@@ -476,7 +486,7 @@ public class Animal : LivingEntity {
     protected void Act () {
         switch (currentAction) {
             case CreatureAction.Exploring:
-                StartMoveToCoord (Environment.GetNextTileWeighted (coord, moveFromCoord));
+                StartMoveToCoord(Mundo.TileTendencia(coord, moveFromCoord, 0.4f));
                 break;
             case CreatureAction.GoingToFood:
                 if (CoordenadasVecinas(coord, foodTarget.coord)) {
@@ -484,7 +494,7 @@ public class Animal : LivingEntity {
                     currentAction = CreatureAction.Eating;
                 } else if(path!=null){
                     if(path.Length > pathIndex){
-                        StartMoveToCoord (path[pathIndex]);
+                        StartMoveToCoord(path[pathIndex]);
                         pathIndex++;
                     }
                 }
@@ -547,7 +557,7 @@ public class Animal : LivingEntity {
                     }
                 }
                 else {
-                    StartMoveToCoord (Environment.GetNextTileWeighted (coord, moveFromCoord));
+                    StartMoveToCoord(Mundo.TileTendencia(coord, moveFromCoord, 0.4f));
                 }
                 break;
         }
@@ -557,12 +567,12 @@ public class Animal : LivingEntity {
     private Vector3Int ReducirDimensionesOverflow(Vector3Int target){
         //print("Direccion original: " + target);
         var aux = target;
-        if(target.x >= Environment.tileCentres.GetLength(0))
-            aux.x = Environment.tileCentres.GetLength(0)-1;
+        if(target.x >= Mundo.centros.GetLength(0))
+            aux.x = Mundo.centros.GetLength(0)-1;
         if(target.x < 0)
             aux.x = 0;
-        if(target.z >= Environment.tileCentres.GetLength(1))
-            aux.z = Environment.tileCentres.GetLength(1)-1;
+        if(target.z >= Mundo.centros.GetLength(1))
+            aux.z = Mundo.centros.GetLength(1)-1;
         if(target.z < 0)
             aux.z = 0;
         //print("Direccion despues de procesar el overflow: " + aux);
@@ -611,7 +621,7 @@ public class Animal : LivingEntity {
         moveFromCoord = coord;
         moveTargetCoord = target;
         moveStartPos = transform.position;
-        moveTargetPos = Environment.tileCentres[moveTargetCoord.x, moveTargetCoord.z];
+        moveTargetPos = Mundo.centros[moveTargetCoord.x, moveTargetCoord.z];
         animatingMovement = true;
 
         //bool diagonalMove = Coord.SqrDistance(moveFromCoord, moveTargetCoord)) > 1;
@@ -674,7 +684,9 @@ public class Animal : LivingEntity {
 
         // Finished moving
         if (moveTime >= 1) {
-            Environment.RegisterMove (this, coord, moveTargetCoord);
+            Mundo.RegistrarMovimiento(this, coord, moveTargetCoord);
+            //Actualizamos moveFromCoord que es la ultima tile en la que hemos estado
+            moveFromCoord = coord;
             coord = moveTargetCoord;
 
             animatingMovement = false;

@@ -56,7 +56,7 @@ public static class EnvironmentUtility {
                 y += dy2;
             }
 
-            if (!Environment.walkable[x, y]) {
+            if (!Mundo.caminable[x, y]) {
                 return false;
             }
         }
@@ -125,7 +125,7 @@ public static class EnvironmentUtility {
                 //NOTA: EN ESTE CASO NO DEVUELVE NADA SI, POR EJEMPLO, HAY UN ARBOL EN EL PATH. ESO NO ES CORRECTO
                 // If not walkable, path is invalid so return null
                 // (unless is target tile, which may be unwalkable e.g water)
-                if (i != longest && !Environment.walkable[x, y]) {
+                if (i != longest && !Mundo.caminable[x, y]) {
                     Debug.Log("Devolvemos null en pathfinder");
                     return null;
                 }

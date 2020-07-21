@@ -173,7 +173,7 @@ public class Environment : MonoBehaviour {
         plantHolder = GameObject.Find("PlantHolder");
         rabbitHolder = GameObject.Find("RabbitHolder");
 
-        prng = new System.Random ();
+        prng = new System.Random();
         Init ();
         SpawnInitialPopulations ();
         menuCausasMuerte = GameObject.Find("CausasMuerte");
@@ -584,14 +584,40 @@ public class Environment : MonoBehaviour {
         ent.Init(pos);
         speciesMaps[ent.species].Añadir(ent, pos);
         if(ent.species == Species.Fox){
+            ParametrosAleatorios(ent, 0.4f);
             ent.transform.parent = foxHolder.transform;
         }
         if(ent.species == Species.Rabbit){
+            ParametrosAleatorios(ent, 0.4f);
             ent.transform.parent = rabbitHolder.transform;
         }
         if(ent.species == Species.Plant){
             ent.transform.parent = plantHolder.transform;
         }
+    }
+    private void ParametrosAleatorios(LivingEntity ent, float maxRango){
+        Animal an = (Animal) ent;
+        /*an.hunger = (float) prng.NextDouble();//AletorioRango(0.1f, maxRango);
+        an.thirst = (float) prng.NextDouble();//AletorioRango(0.1f, maxRango);
+        an.reproductiveUrge = (float) prng.NextDouble();//AletorioRango(0f, maxRango);
+        an.edad = (float) prng.NextDouble();//AletorioRango(0.3f, maxRango);*/
+        an.hunger = AletorioRango(0.1f, maxRango);
+        an.thirst = AletorioRango(0.1f, maxRango);
+        an.reproductiveUrge = AletorioRango(0.1f, maxRango);
+        an.edad = AletorioRango(0.3f, maxRango);
+        //print("Hambre: " + an.hunger + " sed: " + an.thirst + " reproductive urge: " + an.reproductiveUrge + " edad: " + an.edad);
+    }
+
+    ///<summary>Devuelve un float en el rango [min,max)</summary>
+    private float AletorioRango(float min, float max){
+        int minAux = (int)(min*10);
+        int maxAux = (int)(max*10);
+        //print("min float: " + min + " min int: " + minAux +"max float: " + max + " max int: " + maxAux);
+        int aux = prng.Next(minAux, maxAux);
+        //print("Aux: " + aux);
+        float resultado = ( aux / 10f);
+        //print("resultado: " + resultado);
+        return resultado;
     }
 
     static void PrintGenes(Animal an){
