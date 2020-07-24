@@ -4,7 +4,131 @@ using UnityEngine;
 using System;
 
 public static class Pathfinder {
-    
+    //------------------------------------------ALGORITMO A*---------------------------------------------
+    public static Vector3Int[] AStar(int x, int y, int x1, int y1, Mundo.Nodo[,] mapaNodos){
+        List<Vector3Int> pathAux = new List<Vector3Int>();
+        List<Mundo.Nodo> openList = new List<Mundo.Nodo>();
+        List<Mundo.Nodo> closedList = new List<Mundo.Nodo>();
+
+        //Inicializamos el primer nodo
+        mapaNodos[x,y].g = 0;
+        mapaNodos[x,y].h = CalcularH(mapaNodos[x,y], mapaNodos[x1,y1]);
+        mapaNodos[x,y].f = mapaNodos[x,y].g + mapaNodos[x,y].f;
+
+        openList.Add(mapaNodos[x,y]);
+        Mundo.Nodo nodoActual = mapaNodos[x,y];
+        while(openList.Count > 0){
+            nodoActual = NodoMenorF(openList);
+            if(nodoActual.centro == mapaNodos[x1,y1].centro){
+                return CalcularPath(mapaNodos[x1,y1], mapaNodos).ToArray();
+            }
+            openList.Remove(nodoActual);
+            closedList.Add(nodoActual);
+            List<Mundo.Nodo> vecinos = NodosVecinos(nodoActual, mapaNodos);
+            //print("Numero vecinos: " + vecinos.Count);
+            foreach (Mundo.Nodo v in vecinos){
+                //print("Analizando vecinos");
+                Mundo.Nodo aux = v;
+                if(closedList.Contains(aux)){
+                    //print("closedList contiene el vecino, lo saltamos");
+                    continue;
+                }
+                if(!aux.caminable){
+                    if(openList.Contains(aux))
+                        openList.Remove(aux);
+                    closedList.Add(aux);
+                    continue;
+                }
+                int tentativeG = nodoActual.g + CalcularH(nodoActual, aux);
+                //print("TentativeG: " + tentativeG);
+                //print("Valor g del vecino: " + aux.g);
+                if(tentativeG < aux.g){
+                    aux.vieneDe = Indice(nodoActual, mapaNodos);
+                    aux.g = tentativeG;
+                    aux.h = CalcularH(aux, mapaNodos[x1,y1]);
+                    aux.f = aux.g+aux.h;
+                    
+                    //mundo[indiceAux] = aux;
+                    if(!openList.Contains(aux)){
+                        //print("Añadimos el vecino a la openList");
+                        openList.Add(aux);
+                    }
+                }
+            }
+        }
+        return pathAux.ToArray();
+    }
+    private static int CalcularH(Mundo.Nodo a, Mundo.Nodo b){
+        //Hay que dividir entre las dimensiones del cubo
+        int xD = (int) Mathf.Abs(a.centro.x - b.centro.x);
+        int zD = (int) Mathf.Abs(a.centro.z - b.centro.z);
+        int resto = (int) Mathf.Abs(xD - zD);
+        return 14*Math.Min(xD,zD) + 10*resto;
+    }
+    private static Mundo.Nodo NodoMenorF(List<Mundo.Nodo> lista){
+        Mundo.Nodo menor = lista[0];
+        foreach (var n in lista){
+            if(n.f < menor.f)
+                menor = n;
+        }
+        return menor;
+    }
+    private static List<Vector3Int> CalcularPath(Mundo.Nodo a, Mundo.Nodo[,] mapa){
+        List<Vector3Int> res = new List<Vector3Int>();
+        res.Add(a.centro);
+        Mundo.Nodo actual = a;
+        while(actual.vieneDe != (-1,-1)){
+            res.Add(mapa[actual.vieneDe.Item1, actual.vieneDe.Item2].centro);
+            actual = mapa[actual.vieneDe.Item1, actual.vieneDe.Item2];
+            //var aux = mundo[actual.cameFrom];
+            //aux.prefab.material.color = Color.green;
+            //mundo[actual.cameFrom] = aux;
+        }
+        return DarVuelta(res);
+    }
+    private static List<Vector3Int> DarVuelta(List<Vector3Int> lista){
+        List<Vector3Int> aux = new List<Vector3Int>();
+        for (int i = lista.Count-1; i >= 0; i--){
+            aux.Add(lista[i]);
+        }
+        return lista;
+    }
+    //Devuelve el indice de a en el mundo
+    private static (int,int) Indice(Mundo.Nodo a, Mundo.Nodo[,] mapa){
+        for (int x = 0; x < mapa.GetLength(0); x++){
+            for (int y = 0; y < mapa.GetLength(1); y++){
+                if(a.centro == mapa[x,y].centro)
+                    return (x,y);
+            }   
+        }
+        //Error, no esta en la lista
+        return (-1,-1);
+    }
+
+    private static List<Mundo.Nodo> NodosVecinos(Mundo.Nodo a, Mundo.Nodo[,] mapa){
+        List<Mundo.Nodo> vec = new List<Mundo.Nodo>();
+        if(a.centro.x -1 >= 0){
+            vec.Add(mapa[a.centro.x-1, a.centro.z]);//Izquierda
+            if(a.centro.z-1 >= 0)
+                vec.Add(mapa[a.centro.x-1, a.centro.z-1]);//Izquierda abajo
+            if(a.centro.z+1 < Mundo.tamaño)
+                vec.Add(mapa[a.centro.x-1, a.centro.z+1]);//Izquierda arriba
+        }
+        if(a.centro.x + 1 < Mundo.tamaño){
+            vec.Add(mapa[a.centro.x+1, a.centro.z]);//Derecha
+            if(a.centro.z-1 >= 0)
+                vec.Add(mapa[a.centro.x+1, a.centro.z-1]);//Derecha abajo
+            if(a.centro.z+1 < Mundo.tamaño)
+                vec.Add(mapa[a.centro.x+1, a.centro.z+1]);//Derecha arriba
+        }
+        if(a.centro.z-1 >= 0)
+            vec.Add(mapa[a.centro.x, a.centro.z-1]);//Abajo
+        if(a.centro.z+1 < Mundo.tamaño)
+            vec.Add(mapa[a.centro.x, a.centro.z+1]);//Abajo
+        return vec;
+    }
+
+    //--------------------------------------------ALGORITMO BRESENHAM------------------------------------------
     //Una mierda, solo sirve si vamos de izquierda a derecha
     /*public static Vector3Int[] BresenhamError2(int x1, int y1, int x2, int y2) { 
         List<Vector3Int> pathAux = new List<Vector3Int>();
@@ -28,7 +152,6 @@ public static class Pathfinder {
         }
         return pathAux.ToArray();
     }*/
-
     ///<summary>Devuelve el camino desde (x,y) hasta (x1,y1) siguiendo el algoritmo de Brasenham</summary>
     public static Vector3Int[] BresenhamError(int x, int y, int x1, int y1){
         List<Vector3Int> pathAux = new List<Vector3Int>(); var xOriginal = x; var yOriginal = y;

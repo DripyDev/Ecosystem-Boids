@@ -388,7 +388,8 @@ public class Animal : LivingEntity {
         currentAction = CreatureAction.SearchingForMate;
         potentialMates = OrdenarListaAnimales(potentialMates, coord);
         if(potentialMates.Count > 0) {
-            if(EnvironmentUtility.TileIsVisibile(coord.x, coord.z, potentialMates[0].coord.x, potentialMates[0].coord.z))
+            //if(EnvironmentUtility.TileIsVisibile(coord.x, coord.z, potentialMates[0].coord.x, potentialMates[0].coord.z))
+            if(Pathfinder.SeccionVisible(coord.x, coord.z, potentialMates[0].coord.x, potentialMates[0].coord.z))
                 CreatePath(potentialMates[0].coord);
         }
     }
@@ -402,26 +403,34 @@ public class Animal : LivingEntity {
         //Encontramos la entidad que sea fuente de comida mas cercana
         LivingEntity foodSource = Mundo.SentirComida(this, coord, maxViewDistance);
         if (foodSource) {
-            currentAction = CreatureAction.GoingToFood;
+            CreatePath(foodSource.coord);
+            if(path != null){
+                currentAction = CreatureAction.GoingToFood;
             foodTarget = foodSource;
-            CreatePath (foodTarget.coord);
-
-        } else {
+            }
+            else{
+                currentAction = CreatureAction.Exploring;
+            }
+        } 
+        else {
             currentAction = CreatureAction.Exploring;
         }
     }
 
     protected void FindWater () {
-        //Encontramos la tile de agua mas cercana
-        Vector3Int waterTile = Mundo.SentirAgua(coord, maxViewDistance);
-        //Si la coordenada es valida, vamos ahi
-        if (waterTile != Mundo.invalid) {
-            currentAction = CreatureAction.GoingToWater;
-            waterTarget = waterTile;
-            CreatePath (waterTarget);
-        } 
-        //Sino, volvemos a explorar
-        else {
+        Vector3Int agua = Mundo.SentirAgua(coord, maxViewDistance);
+        if(agua!=Mundo.invalid){
+            CreatePath(agua);
+            //Puede que no veamos el agua
+            if(path!=null){
+                currentAction = CreatureAction.GoingToWater;
+                waterTarget = agua;
+            }
+            else{
+                currentAction = CreatureAction.Exploring;
+            }
+        }
+        else{
             currentAction = CreatureAction.Exploring;
         }
     }

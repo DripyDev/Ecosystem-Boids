@@ -14,8 +14,11 @@ public class Mundo : MonoBehaviour {
     int tamañoRegionesMapa = 10;
     ///<summary>Semilla que utilizamos para randomizar valores</summary>
     public int seed;
+    //NOTA: EN LUGAR DE CENTROS QUE SEAN NODOS. UNA ESTRUCTURA CON H,F,G,NODOANTERIOR Y CENTRO. NO ALTERARIA MUCHO LA ESTRUCTURA GENERAL
     ///<summary>Matriz con los centros de cada tile del mundo</summary>
     public static Vector3[,] centros;
+    ///<summary>Matriz con los centros de cada tile del mundo</summary>
+    public static Nodo[,] mapaNodos;
     ///<summary>Matriz con las tiles caminables del mundo</summary>
     public static bool[,] caminable;
     ///<summary>Lista con todas las coordenadas caminables del mapa</summary>
@@ -345,6 +348,8 @@ public class Mundo : MonoBehaviour {
         caminable = datosTerreno.walkable;
         tamaño = datosTerreno.size;
 
+        mapaNodos = new Nodo[tamaño,tamaño];
+        print("Start 1 Long matriz mapaNodos: " + mapaNodos.GetLength(0) + "," + mapaNodos.GetLength(1));
         coordenadasCaminables = new List<Vector3Int>();
 
         //Numero de ESPECIES
@@ -443,7 +448,8 @@ public class Mundo : MonoBehaviour {
                         int targetY = y + viewOffsetsArr[i].y;
                         if (targetX >= 0 && targetX < tamaño && targetY >= 0 && targetY < tamaño) {
                             if (datosTerreno.shore[targetX, targetY]) {
-                                if (EnvironmentUtility.TileIsVisibile (x, y, targetX, targetY)) {
+                                //if (EnvironmentUtility.TileIsVisibile (x, y, targetX, targetY)) {
+                                if (Pathfinder.SeccionVisible(x, y, targetX, targetY)) {
                                     aguaMasCercana[x, y] = new Vector3Int (targetX, 0, targetY);
                                     foundWater = true;
                                     break;
@@ -528,6 +534,8 @@ public class Mundo : MonoBehaviour {
         var holder = GameObject.Find("TreeHolder");
         for (int x = 0; x < tamaño; x++) {
             for (int y = 0; y < tamaño; y++) {
+                //PRUEBA MAPA NODOS
+                mapaNodos[x,y] = new Nodo(Vector3Int.FloorToInt(centros[x,y]), (-1,-1));
                 if(caminable[x,y]){
                     if(rnd.NextDouble() < probabilidadArboles){
                         var rotX = (float) rnd.NextDouble(); var rotY = (float) rnd.NextDouble(); var rotZ = (float) rnd.NextDouble();
@@ -537,6 +545,8 @@ public class Mundo : MonoBehaviour {
                         arbol.transform.parent = holder.transform;
                         arbol.transform.localScale *= scale;
                         caminable[x,y] = false;
+                        //PRUEBA MAPA NODOS
+                        mapaNodos[x,y].caminable = false;
                     }
                     else{
                         //print("Añadimos centro a la lista de coordenadasCaminables: " + centros[x,y]);
@@ -601,5 +611,23 @@ public class Mundo : MonoBehaviour {
     public struct Population {
         public LivingEntity prefab;
         public int count;
+    }
+    
+    ///<summary>Estructura de nodos para usar el algoritmo A*</summary>
+    public struct Nodo{
+        public Vector3Int centro;
+        public bool caminable;
+        public int g;
+        public int h;
+        public int f;
+        public (int,int) vieneDe;
+        public Nodo(Vector3Int cent, (int,int) vieneDeInvalido){
+            this.centro = cent;
+            this.caminable = true;
+            this.g = int.MaxValue;
+            this.h=0;
+            this.f=this.g + this.h;;
+            this.vieneDe=vieneDeInvalido;
+        }
     }
 }

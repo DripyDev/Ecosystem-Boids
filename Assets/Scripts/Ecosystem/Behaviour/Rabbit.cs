@@ -135,6 +135,12 @@ public class Rabbit : Animal {
                 Gizmos.color = Color.blue; 
                 Gizmos.DrawLine (transform.position, Mundo.centros[surroundings.nearestWaterTile.x, surroundings.nearestWaterTile.z]);
             }*/
+            if(Mundo.aguaMasCercana[coord.x, coord.z] != Mundo.invalid){
+                //var aux = new Vector3(coord.x-0.5f, 0, coord.z-0.5f);
+                //var aux2 = new Vector3(Mundo.aguaMasCercana[coord.x, coord.z].x-0.5f, 0, Mundo.aguaMasCercana[coord.x, coord.z].z-0.5f);
+                Gizmos.color = Color.black;
+                Gizmos.DrawLine(coord, Mundo.aguaMasCercana[coord.x, coord.z]);
+            }
             if(path != null){
                 Gizmos.color = Color.green;
                 for (int i = 0; i < path.Length; i++) {
