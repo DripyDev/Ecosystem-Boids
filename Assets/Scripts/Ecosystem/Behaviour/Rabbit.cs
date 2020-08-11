@@ -27,6 +27,19 @@ public class Rabbit : Animal {
         Crecer();
         comprobarEmbarazo();
 
+        //Path ya recorrido, lo reseteamos
+        if(path != null){
+            if(pathIndex >= path.Length)
+                path=null;
+        }
+
+        //Si ya estamos en el final del path, lo reseteamos (es para evitar que al final del path vayamos, por ejemplo, a por agua y no podamos ir porque noe sta visible)
+        if(path != null && path.Length > 0){
+            if(coord == path[path.Length-1]){
+                print("Estamos al final del path, lo reseteamos");
+                path = null;
+            }
+        }
         
         //material.color += new Color(material.color.r,edad,edad,0);
 
@@ -102,6 +115,7 @@ public class Rabbit : Animal {
     private void HuirDepredador(Vector3Int depredador){
         depredadorMasCercano = depredador;
         currentAction = CreatureAction.Fleeing;
+        //print("Huimos a: " + base.coord + (base.coord - depredador));
         CreatePath(base.coord + (base.coord - depredador));
     }
 
@@ -111,6 +125,10 @@ public class Rabbit : Animal {
     }
     public void OnMouseDown(){
         GameObject.Find("InformacionAnimal").GetComponent<InformacionAnimal>().SetAnimal(this);
+    }
+
+    private Vector3 SumarCeroCinco(Vector3 v){
+        return new Vector3(v.x + 0.5f, 0, v.z + 0.5f);
     }
 
     void OnDrawGizmosSelected () {
@@ -136,10 +154,8 @@ public class Rabbit : Animal {
                 Gizmos.DrawLine (transform.position, Mundo.centros[surroundings.nearestWaterTile.x, surroundings.nearestWaterTile.z]);
             }*/
             if(Mundo.aguaMasCercana[coord.x, coord.z] != Mundo.invalid){
-                //var aux = new Vector3(coord.x-0.5f, 0, coord.z-0.5f);
-                //var aux2 = new Vector3(Mundo.aguaMasCercana[coord.x, coord.z].x-0.5f, 0, Mundo.aguaMasCercana[coord.x, coord.z].z-0.5f);
                 Gizmos.color = Color.black;
-                Gizmos.DrawLine(coord, Mundo.aguaMasCercana[coord.x, coord.z]);
+                Gizmos.DrawLine(SumarCeroCinco(coord), SumarCeroCinco(Mundo.aguaMasCercana[coord.x, coord.z]));
             }
             if(path != null){
                 Gizmos.color = Color.green;
@@ -149,7 +165,7 @@ public class Rabbit : Animal {
             }
             if(depredadorMasCercano != new Vector3(0,0,0)){
                 Gizmos.color = Color.yellow;
-                Gizmos.DrawLine(coord, coord - (depredadorMasCercano - coord));
+                Gizmos.DrawLine(SumarCeroCinco(coord), SumarCeroCinco(coord - (depredadorMasCercano - coord)) );
             }
             if (currentAction == CreatureAction.GoingToFood && path != null) {
                 //var path = EnvironmentUtility.GetPath (coord.x, coord.y, foodTarget.coord.x, foodTarget.coord.y);
@@ -158,6 +174,25 @@ public class Rabbit : Animal {
                     Gizmos.DrawSphere (Mundo.centros[path[i].x, path[i].z], .2f);
                 }
             }
+            var mapa = Mundo.mapasEspecies[Species.Rabbit];
+            var listaRegiones = mapa.RegionesVisibles(coord, maxViewDistance);
+            for (int i = 0; i < listaRegiones.Count; i++){
+                var colorcito = Color.black;
+                colorcito.a = 0.3f;
+                Gizmos.color = colorcito;
+                Gizmos.DrawCube(mapa.centros[listaRegiones[i].Item1, listaRegiones[i].Item2], new Vector3(mapa.tamañoRegion, mapa.tamañoRegion, mapa.tamañoRegion));
+            }
+            var colorcito2 = Color.magenta;var colorcito3 = Color.yellow;
+            colorcito2.a = 0.3f;colorcito3.a = 0.3f;
+            Gizmos.color = colorcito2;
+            
+            var animales = mapa.ObtenerEntidades(coord, maxViewDistance);
+            var aMAsCercano = mapa.EntidadMascercana(coord, maxViewDistance);
+            foreach (var a in animales){
+                Gizmos.DrawSphere(SumarCeroCinco(a.coord), 0.1f);
+            }
+            Gizmos.color = colorcito3;
+            Gizmos.DrawSphere(aMAsCercano.coord, 0.1f);
         }
     }
 }

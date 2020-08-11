@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-
+//NOTA: NO LO USAMOS, LO HEMOS SUSTITUIDO POR VECTOR3INT
 // Replacement for Vector2Int, which was causing slowdowns in big loops due to x,y accessor overhead
 [System.Serializable]
 public struct Coord {

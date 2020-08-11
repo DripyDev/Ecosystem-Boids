@@ -5,8 +5,14 @@ using System;
 
 public static class Pathfinder {
     //------------------------------------------ALGORITMO A*---------------------------------------------
+    //La idea es solo usarlo cuando Bresenham no funciona porque no seria muy eficiente que siempre buscaran con este algoritmo
+    ///<summary>Algoritmo de busqueda A*. Dado un origen (x,y), un destino (x1,y1) y el mapa de nodos sobre el que se va a operar. Devuelve el camino segun A* evitando obstaculos</summary>
     public static Vector3Int[] AStar(int x, int y, int x1, int y1, Mundo.Nodo[,] mapaNodos){
-        List<Vector3Int> pathAux = new List<Vector3Int>();
+        if(!mapaNodos[x,y].caminable){
+            Debug.Log("Partimos de no caminable, devolvemos null");
+            return null;
+        }
+
         List<Mundo.Nodo> openList = new List<Mundo.Nodo>();
         List<Mundo.Nodo> closedList = new List<Mundo.Nodo>();
 
@@ -19,26 +25,32 @@ public static class Pathfinder {
         Mundo.Nodo nodoActual = mapaNodos[x,y];
         while(openList.Count > 0){
             nodoActual = NodoMenorF(openList);
+
+            //Hemos llegado al objetivo
             if(nodoActual.centro == mapaNodos[x1,y1].centro){
-                return CalcularPath(mapaNodos[x1,y1], mapaNodos).ToArray();
+                //return CalcularPath(mapaNodos[x1,y1], mapaNodos).ToArray();
+                return CalcularPath(nodoActual, mapaNodos).ToArray();
             }
+
             openList.Remove(nodoActual);
             closedList.Add(nodoActual);
             List<Mundo.Nodo> vecinos = NodosVecinos(nodoActual, mapaNodos);
             //print("Numero vecinos: " + vecinos.Count);
             foreach (Mundo.Nodo v in vecinos){
-                //print("Analizando vecinos");
                 Mundo.Nodo aux = v;
-                if(closedList.Contains(aux)){
-                    //print("closedList contiene el vecino, lo saltamos");
+
+                //Si el vecino esta en closed list, lo saltamos
+                if(closedList.Contains(aux))
                     continue;
-                }
+
+                //Si es una tile no caminable, la metemos en closed list
                 if(!aux.caminable){
-                    if(openList.Contains(aux))
-                        openList.Remove(aux);
+                    //if(openList.Contains(aux))
+                    //    openList.Remove(aux);
                     closedList.Add(aux);
                     continue;
                 }
+
                 int tentativeG = nodoActual.g + CalcularH(nodoActual, aux);
                 //print("TentativeG: " + tentativeG);
                 //print("Valor g del vecino: " + aux.g);
@@ -48,23 +60,26 @@ public static class Pathfinder {
                     aux.h = CalcularH(aux, mapaNodos[x1,y1]);
                     aux.f = aux.g+aux.h;
                     
-                    //mundo[indiceAux] = aux;
+                    var indiceAux = Indice(aux, mapaNodos);
+                    mapaNodos[indiceAux.Item1, indiceAux.Item2] = aux;
                     if(!openList.Contains(aux)){
-                        //print("Añadimos el vecino a la openList");
                         openList.Add(aux);
                     }
                 }
             }
         }
-        return pathAux.ToArray();
+        Debug.Log("No hemos encontrado el camino con A*");
+        return null;
     }
+    
     private static int CalcularH(Mundo.Nodo a, Mundo.Nodo b){
-        //Hay que dividir entre las dimensiones del cubo
+        //Hay que dividir entre las dimensiones del cubo que en nuestro caso es 1
         int xD = (int) Mathf.Abs(a.centro.x - b.centro.x);
         int zD = (int) Mathf.Abs(a.centro.z - b.centro.z);
         int resto = (int) Mathf.Abs(xD - zD);
         return 14*Math.Min(xD,zD) + 10*resto;
     }
+
     private static Mundo.Nodo NodoMenorF(List<Mundo.Nodo> lista){
         Mundo.Nodo menor = lista[0];
         foreach (var n in lista){
@@ -73,6 +88,7 @@ public static class Pathfinder {
         }
         return menor;
     }
+
     private static List<Vector3Int> CalcularPath(Mundo.Nodo a, Mundo.Nodo[,] mapa){
         List<Vector3Int> res = new List<Vector3Int>();
         res.Add(a.centro);
@@ -86,13 +102,19 @@ public static class Pathfinder {
         }
         return DarVuelta(res);
     }
+
+    ///<summary>Dada una lista, la devuelve dada la vuelta</summary>
     private static List<Vector3Int> DarVuelta(List<Vector3Int> lista){
         List<Vector3Int> aux = new List<Vector3Int>();
         for (int i = lista.Count-1; i >= 0; i--){
             aux.Add(lista[i]);
         }
-        return lista;
+        //Eliminamos el primer nodo que es nuestra posicion original
+        if(aux.Count > 0)
+            aux.RemoveAt(0);
+        return aux;
     }
+
     //Devuelve el indice de a en el mundo
     private static (int,int) Indice(Mundo.Nodo a, Mundo.Nodo[,] mapa){
         for (int x = 0; x < mapa.GetLength(0); x++){
@@ -105,6 +127,7 @@ public static class Pathfinder {
         return (-1,-1);
     }
 
+    ///<summary>Dado un nodo y el mapa del que forma parte. Devuelve todos sus nodos vecinos (8 como maximo)</summary>
     private static List<Mundo.Nodo> NodosVecinos(Mundo.Nodo a, Mundo.Nodo[,] mapa){
         List<Mundo.Nodo> vec = new List<Mundo.Nodo>();
         if(a.centro.x -1 >= 0){
@@ -124,7 +147,7 @@ public static class Pathfinder {
         if(a.centro.z-1 >= 0)
             vec.Add(mapa[a.centro.x, a.centro.z-1]);//Abajo
         if(a.centro.z+1 < Mundo.tamaño)
-            vec.Add(mapa[a.centro.x, a.centro.z+1]);//Abajo
+            vec.Add(mapa[a.centro.x, a.centro.z+1]);//Arriba
         return vec;
     }
 
@@ -152,9 +175,10 @@ public static class Pathfinder {
         }
         return pathAux.ToArray();
     }*/
-    ///<summary>Devuelve el camino desde (x,y) hasta (x1,y1) siguiendo el algoritmo de Brasenham</summary>
+
+    ///<summary>Devuelve el camino desde (x,y) hasta (x1,y1) siguiendo el algoritmo de Bresenham</summary>
     public static Vector3Int[] BresenhamError(int x, int y, int x1, int y1){
-        List<Vector3Int> pathAux = new List<Vector3Int>(); var xOriginal = x; var yOriginal = y;
+        List<Vector3Int> pathAux = new List<Vector3Int>();
         //Debug.Log("Vamos desde: " + x + " " + y + " a: " + x1 + " " + y1);
         
         int dx = Math.Abs(x1-x);
@@ -170,10 +194,13 @@ public static class Pathfinder {
             //Nos hemos pasado y algo ha fallado, devolvemos null
             if(x > Mundo.caminable.GetLength(0)-1 || y > Mundo.caminable.GetLength(1)-1)
                 return null;
-            //Si la seccion no es caminable pero no somos vecinos del objetivo intentamos bordear
-            if(!Mundo.caminable[x,y] && x != xOriginal && y != yOriginal){
-                //NOTA: DE MOMENTO DEVOLVEMOS NULL, EN EL FUTURO INTENTAR BORDEAR O ALGO
-                //Debug.Log("El camino es unwalkable");
+            //Si la seccion no es caminable pero no es el objetivo intentamos bordear
+            if(!Mundo.caminable[x,y] && (x != x1 && y != y1) ){
+                //NOTA: DE MOMENTO DEVOLVEMOS NULL, deberiamos de intentar usar A* para encontrar el camino
+                Debug.Log("El camino es unwalkable, devolvemos hasta donde podemos llegar");
+                /*if(pathAux.Count > 0)
+                    pathAux.RemoveAt(0);
+                return pathAux.ToArray();*/
                 return null;
             }
             //El caminos es caminable, seguimos
@@ -188,6 +215,7 @@ public static class Pathfinder {
             //if(x==x1 && y==y1)
             if( (x==x1-1 && y==y1-1) || (x==x1 && y==y1) )
                 break;
+
             var e2 = 2*err;
             if(e2>=dy){
                 err += dy;
@@ -208,12 +236,17 @@ public static class Pathfinder {
         //Para saber si tenemos que avanzar o retroceder en los ejes
         var sx = x < x1? 1:-1;
         var sy = y < y1? 1:-1;
+
         while(true){
-            //El camino no es caminable. Path no valido
-            if(!Mundo.caminable[x,y] && Math.Abs(x1-x) != 0 && Math.Abs(y1-y) != 0)
+            //El camino no es caminable. Devolvemos hasta donde podemos llegar
+            if(!Mundo.caminable[x,y] ){
+                /*if(pathAux.Count > 0)
+                    pathAux.RemoveAt(0);//Eliminamos el primer punto que es nuestra posicion original
+                return pathAux.ToArray();*/
                 return null;
+            }
             pathAux.Add(new Vector3Int(x, 0, y));
-            //if(x==x1 && y==y1)
+            //Hemos llegado al final
             if((x==x1-1 && y==y1-1) || (x==x1 && y==y1))
                 break;
             if(x != x1){
@@ -226,6 +259,8 @@ public static class Pathfinder {
         pathAux.RemoveAt(0);//Eliminamos el primer punto que es nuestra posicion original
         return pathAux.ToArray();
     }
+
+    //NOTA: SECCION VISIBLE USA BRESENHAM ASI QUE NUNCA VAMOS A USAR A* PORQUE LAS ENTIDADES QUE NO ESTAN A LA VISTA NOS LAS VAMOS A INTENTAR BUSCAR
 
     ///<summary>Devuelve si hay un camino sin interrumpir desde (x,y) hasta (x1,y1)</summary>
     public static bool SeccionVisible (int x, int y, int x1, int y1) {

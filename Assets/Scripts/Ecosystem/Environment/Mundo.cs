@@ -10,21 +10,29 @@ public class Mundo : MonoBehaviour {
     //MAPA/MUNDO
     [Header ("MAPA / MUNDO")]
     TerrainGenerator.TerrainData datosTerreno;
+
     ///<summary>El tamaño de las regiones en las que subdividimos el mundo para el mapa</summary>
     int tamañoRegionesMapa = 10;
+
     ///<summary>Semilla que utilizamos para randomizar valores</summary>
     public int seed;
+
     //NOTA: EN LUGAR DE CENTROS QUE SEAN NODOS. UNA ESTRUCTURA CON H,F,G,NODOANTERIOR Y CENTRO. NO ALTERARIA MUCHO LA ESTRUCTURA GENERAL
     ///<summary>Matriz con los centros de cada tile del mundo</summary>
     public static Vector3[,] centros;
-    ///<summary>Matriz con los centros de cada tile del mundo</summary>
+
+    ///<summary>Matriz con los centros de cada tile del mundo, lo usamos para A*</summary>
     public static Nodo[,] mapaNodos;
+
     ///<summary>Matriz con las tiles caminables del mundo</summary>
     public static bool[,] caminable;
+
     ///<summary>Lista con todas las coordenadas caminables del mapa</summary>
     public static List<Vector3Int> coordenadasCaminables;
+
     ///<summary>El tamaño del mapa es tamaño x tamaño</summary>
     public static int tamaño;
+
     //static Vector3Int[, ][] walkableNeighboursMap; No hace falta aunque puede que sea mas eficiente asi
     //static List<Vector3Int> walkableCoords; No hace falta porque ya tenemos la matriz caminable
     ///<summary>Una matriz con las coordenadas del agua mas cercana de cada tile. Asi no hace falta buscarlas cada vez</summary>
@@ -44,7 +52,7 @@ public class Mundo : MonoBehaviour {
     ///<summary>Relacion Depredador - Lista de presas</summary>
     private static Dictionary<Species, List<Species>> presasDepredador;
     ///<summary>Contiene el mapa correspondiente a cada especie</summary>
-    private static  Dictionary<Species, Mapa> mapasEspecies;
+    public static  Dictionary<Species, Mapa> mapasEspecies;
 
     //POBLACION
     [Header ("POBLACION")]
@@ -158,7 +166,7 @@ public class Mundo : MonoBehaviour {
             }
         }
     }
-
+    
     //Funcion principal que inicia el ecosistema
     public void Start () {
         //NOTA: CAMBIAR O QUITAR
@@ -204,7 +212,7 @@ public class Mundo : MonoBehaviour {
         var presas = presasDepredador[dep.species];
         foreach (var p in presas) {
             foreach (var ent in mapasEspecies[p].ObtenerEntidades(desde, distanciaV)){
-                if(Vector3Int.Distance(ent.coord, desde) <= distanciaV && Pathfinder.SeccionVisible(ent.coord.x, ent.coord.z, desde.x, desde.z))
+                if(Vector3Int.Distance(ent.coord, desde) <= distanciaV)// && Pathfinder.SeccionVisible(ent.coord.x, ent.coord.z, desde.x, desde.z))
                     lista.Add(ent);
             }
         }
@@ -222,7 +230,7 @@ public class Mundo : MonoBehaviour {
         foreach(var ser in seresEspecie){
             Animal animalSer = (Animal) ser;
             if( animalSer.genes.isMale != yoAnimal.genes.isMale && animalSer.currentAction == CreatureAction.SearchingForMate)
-                if(Pathfinder.SeccionVisible(yoAnimal.coord.x, yoAnimal.coord.z, animalSer.coord.z, animalSer.coord.z))
+                //if(Pathfinder.SeccionVisible(yoAnimal.coord.x, yoAnimal.coord.z, animalSer.coord.z, animalSer.coord.z))
                     lista.Add(ser);
         }
         return lista;
@@ -240,11 +248,14 @@ public class Mundo : MonoBehaviour {
 
     ///<summary>Devuelve el siguiente tile de manera aleatoria</summary>
     public static Vector3Int TileRandom(Vector3Int origen){
-        //print("origen: " + origen);
         //Guardamos las tiles caminables a nuestro alrededor
         List<Vector3Int> tilesCaminable = new List<Vector3Int>();
         for (int x = -1; x <= 1; x++){
-            for (int y = -1; y < 1; y++) {
+            for (int y = -1; y <= 1; y++) {
+                //Saltamos nuestra propia tile
+                if(x==0&&y==0)
+                    continue;
+                
                 var X = origen.x + x;
                 if(X < 0)
                     X=0;
@@ -255,13 +266,13 @@ public class Mundo : MonoBehaviour {
                     Y=0;
                 if(Y >= tamaño)
                     Y=tamaño-1;
-                //print("X: " + X + " Y: " + Y);
-                if(caminable[X, Y])
+                if(caminable[X, Y]){
+                    //tilesCaminable.Add(Vector3Int.RoundToInt(centros[X,Y]));
                     tilesCaminable.Add(new Vector3Int(X,0,Y));
+                }
             }
         }
-        int indiceRandom = rnd.Next(0,tilesCaminable.Count);
-        return tilesCaminable[indiceRandom];
+        return tilesCaminable[rnd.Next(0,tilesCaminable.Count)];
     }
 
     private static Vector3Int ComprobarOverflow(Vector3Int coord){
@@ -331,6 +342,15 @@ public class Mundo : MonoBehaviour {
         return TileRandom(origen);
     }
 
+    ///<summary>Recorremos las tiles caminables para igualar mapaNodos.caminables a ellos. Asi hacemos que el agua NO sea caminable</summary>
+    private void CaminablesAgua(){
+        for (int x = 0; x < caminable.GetLength(0); x++) {
+            for (int y = 0; y < caminable.GetLength(1); y++) {
+                mapaNodos[x,y].caminable = caminable[x,y];
+            }
+        }
+    }
+
     // Call terrain generator and cache useful info
     //NOTA: CAMBIAR
     public void Init () {
@@ -349,6 +369,7 @@ public class Mundo : MonoBehaviour {
         tamaño = datosTerreno.size;
 
         mapaNodos = new Nodo[tamaño,tamaño];
+        CaminablesAgua();//Tenemos en cuenta el agua para que no sea caminable
         print("Start 1 Long matriz mapaNodos: " + mapaNodos.GetLength(0) + "," + mapaNodos.GetLength(1));
         coordenadasCaminables = new List<Vector3Int>();
 
@@ -449,11 +470,11 @@ public class Mundo : MonoBehaviour {
                         if (targetX >= 0 && targetX < tamaño && targetY >= 0 && targetY < tamaño) {
                             if (datosTerreno.shore[targetX, targetY]) {
                                 //if (EnvironmentUtility.TileIsVisibile (x, y, targetX, targetY)) {
-                                if (Pathfinder.SeccionVisible(x, y, targetX, targetY)) {
+                                //if (Pathfinder.SeccionVisible(x, y, targetX, targetY)) {
                                     aguaMasCercana[x, y] = new Vector3Int (targetX, 0, targetY);
                                     foundWater = true;
                                     break;
-                                }
+                                //}
                             }
                         }
                     }
@@ -579,6 +600,19 @@ public class Mundo : MonoBehaviour {
         return (aux / 10f);
     }
 
+    ///<summary>Dada una matriz de Nodo la recorre y resetea sus valores</summary>
+    public static Nodo[,] ResetMapaNodos(Nodo[,] mapa){
+        for (int x = 0; x < mapa.GetLength(0); x++){
+            for (int y = 0; y < mapa.GetLength(0); y++){
+                mapa[x,y].g = int.MaxValue;
+                mapa[x,y].h = 0;
+                mapa[x,y].f = mapa[x,y].g + mapa[x,y].h;
+                mapa[x,y].vieneDe = (-1,-1);
+            }
+        }
+        return mapa;
+    }
+
     public bool crearTxt = false;
     private string path;
     private void CrearArchivo(){
@@ -606,6 +640,27 @@ public class Mundo : MonoBehaviour {
         }
     }
 
+    //Vamos a dibujar un mapa para los conejos
+    void OnDrawGizmosSelected() {
+        var aux = Color.blue;
+        aux.a = 0.1f;
+        Gizmos.color = aux;
+        Mapa con = mapasEspecies[Species.Rabbit];
+        for (int x = 0; x < con.centros.GetLength(0); x++){
+            for (int y = 0; y < con.centros.GetLength(1); y++){
+                Gizmos.DrawCube(con.centros[x,y], new Vector3(con.tamañoRegion, con.tamañoRegion, con.tamañoRegion));
+            }
+        }
+        /*foreach (var m in mapasEspecies){
+            Mapa aux = m.Value;
+            for (int x = 0; x < aux.centros.GetLength(0); x++){
+                for (int y = 0; y < aux.centros.GetLength(1); y++){
+                    Gizmos.DrawCube(aux.centros[x,y], new Vector3(aux.tamañoRegion, aux.tamañoRegion, aux.tamañoRegion));
+                }
+            }
+        }*/
+    }
+
     //Estructura para guardar la poblacion de un tipo de entidad viva
     [System.Serializable]
     public struct Population {
@@ -626,7 +681,7 @@ public class Mundo : MonoBehaviour {
             this.caminable = true;
             this.g = int.MaxValue;
             this.h=0;
-            this.f=this.g + this.h;;
+            this.f=this.g + this.h;
             this.vieneDe=vieneDeInvalido;
         }
     }

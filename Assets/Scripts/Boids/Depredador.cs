@@ -203,15 +203,32 @@ public class Depredador : MonoBehaviour
             return false;
     }
 
+    ///<summary>Dado un numero de puntos N, devuelve un array de Vector3 con n puntos uniformemente distribuidos  en una esfera a partir del golden ratio</summary>
+    private Vector3[] EsferaFibonacci(int numeroPuntos){
+        Vector3[] puntos = new Vector3[numeroPuntos];
+        var goldenN = (1 + Math.Pow(5,0.5)) / 2;
+        for (int i = 0; i < numeroPuntos; i++){
+            var theta = 2 * Math.PI * (i/goldenN);
+            var phi = Math.Acos(1-2*(i+0.5f)/numeroPuntos);
+            puntos[i] = new Vector3((float) Math.Cos(theta)* (float) Math.Sin(phi), (float) Math.Sin(theta)* (float) Math.Sin(phi), (float) Math.Cos(phi));
+        }
+        return puntos;
+    }
+
     public Ray rayo;//Rayo para dibujar en gizmos
     ///<summary>Decidimos a donde nos movemos en funcion de los rayos casteados</summary>
     Vector3 ObstacleRays () {
         //Vector con las direcciones de los rayos en funcion del numero aureo
-        Vector3[] rayDirections = BoidHelper.directions;
+        //Vector3[] rayDirections2 = BoidHelper.directions;
+        Vector3[] rayDirections = EsferaFibonacci(300);
         //Si un rayo NO golpea, nos movemos en esa direccion
         for (int i = 0; i < rayDirections.Length; i++) {
-            Vector3 dir = this.transform.TransformDirection (rayDirections[i]);
+            Vector3 dir = rayDirections[i]-transform.position;
             Ray ray = new Ray (transform.position, dir);
+
+            //Pasa la direccion de espacio local a espacio global. No tengo muy claro el porque
+            //Vector3 dir2 = this.transform.TransformDirection (rayDirections2[i]);
+            //Ray ray2 = new Ray (transform.position, dir2);
             //Devolvemos la direccion del primer rayo que no golpea un obstaculo
             if (!Physics.SphereCast (ray, 0.2f, settings.distanciaEvitarColision, settings.mascaraObstaculos)) {
                 rayo = ray;
@@ -279,7 +296,7 @@ public class Depredador : MonoBehaviour
         }
         //Si por algun casual nos salimos del mapa, la region va a ser -1 y va a petar. Reseteamos el boid a al primer cubo del mapa de regiones
         catch(ArgumentOutOfRangeException){
-            print("He petado con gpu, ultima region en la que estaba: " + regionAnterior);
+            //print("He petado con gpu, ultima region en la que estaba: " + regionAnterior);
             this.Inicializar(settings, RegionManager.mapaRegiones[0].posicion);
         }
     }

@@ -74,6 +74,7 @@ public class Fox : Animal{
     public override void Init (Vector3Int coord) {
         base.Init(coord);
     }
+
     public void OnMouseDown(){
         GameObject.Find("InformacionAnimal").GetComponent<InformacionAnimal>().SetAnimal(this);
     }

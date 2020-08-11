@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+///<summary>Clase encargada de crear y administrar las regiones en las que se subdivide el mapa.\n
+///</summary>
 public class Mapa {
     public Vector3[,] centros;
     public List<LivingEntity>[,] mapaAnimales ;
@@ -13,6 +15,7 @@ public class Mapa {
     public Mapa(int tamañoMapa, int tamañoR){
         this.tamañoRegion = tamañoR;
         this.numeroRegiones = tamañoMapa/tamañoRegion;
+        Debug.Log("Numero de regiones: " + numeroRegiones);
         this.centros = new Vector3[numeroRegiones, numeroRegiones];
         this.mapaAnimales = new List<LivingEntity>[numeroRegiones,numeroRegiones];
         
@@ -92,10 +95,12 @@ public class Mapa {
         }*/
         //return regions;
         List<(int,int)> regiones = new List<(int,int)>();
+        //Region en la que estamos
         int regionX = origen.x/tamañoRegion; int regionY = origen.z/tamañoRegion;
+        //Maximo numero de regiones que podemos llegar a ver con nuestra distancia de vision
         int maximoRegionesVisibles = (int) Mathf.Max(1, distanciaVision/tamañoRegion);
-        for (int x = -maximoRegionesVisibles; x < maximoRegionesVisibles; x++){
-            for (int y = -maximoRegionesVisibles; y < maximoRegionesVisibles; y++){
+        for (int x = -maximoRegionesVisibles; x <= maximoRegionesVisibles; x++){
+            for (int y = -maximoRegionesVisibles; y <= maximoRegionesVisibles; y++){
                 int regionVisibleX = regionX + x; int regionVisibleY = regionY + y;
                 if( regionVisibleX >= 0 && regionVisibleX < numeroRegiones && regionVisibleY >= 0 && regionVisibleY < numeroRegiones){
                     if(Vector3.Distance(centros[regionVisibleX, regionVisibleY], origen) <= distanciaVision){
@@ -126,7 +131,7 @@ public class Mapa {
         int ultimoIndice = mapaAnimales[regionX, regionY].Count - 1;
         //Por si no hay ninguna entidad en la region
         ultimoIndice = ultimoIndice < 0 ? 0 : ultimoIndice;
-        //Si no estamos en el ultimo indice, colcoamos el ultimo en nuestro indice
+        //Si no estamos en el ultimo indice, colocamos el ultimo en nuestro indice
         if (indice != ultimoIndice) {
             //Error con index en las siguientes dos lineas
             mapaAnimales[regionX, regionY][indice] = mapaAnimales[regionX, regionY][ultimoIndice];
@@ -139,10 +144,11 @@ public class Mapa {
 
     ///<summary>Movemos la entidad eliminando y añadiendola en la region del mapa correspondiente si hace falta</summary>
     public void Mover(LivingEntity ent, Vector3Int de, Vector3Int a){
-        //Debug.Log("Nos movemos de: " + de + " a: " + a);
+        //Region correspondiente a 'de' (origen)
         int regOX = de.x/tamañoRegion; int regOY = de.z/tamañoRegion;
+        //Region correspondiente a 'a' (destino)
         int regDX = a.x/tamañoRegion; int regDY = a.z/tamañoRegion;
-        //Si la region de y a son iguales, no hace falta que hagamos ninguna operacion porque no nos vamos a mover de la region
+        //Si la region 'de' y 'a' son iguales, no hace falta que hagamos ninguna operacion porque no nos vamos a mover de la region
         if(regOX != regDX || regOY != regDY){
             Eliminar(ent, de);
             Añadir(ent, a);

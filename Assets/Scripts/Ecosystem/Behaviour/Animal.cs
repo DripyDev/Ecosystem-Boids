@@ -4,8 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 
-//Animal hereda de LivingEntity
 public class Animal : LivingEntity {
+    public Mundo.Nodo[,] mapaNodos;
     ///<summary>Campo de vision del animal.</summary>
     public int maxViewDistance = 10;
 
@@ -79,7 +79,7 @@ public class Animal : LivingEntity {
     float moveArcHeightFactor;
     //Array de coordenadas que es el camino que va a coger el agente
     public Vector3Int[] path;
-    int pathIndex;
+    public int pathIndex;
 
     // Other
     ///<summary>Tiempo en segundos desde la ultima actionChooseTime</summary>
@@ -168,6 +168,9 @@ public class Animal : LivingEntity {
         env = (Mundo) GameObject.Find("Environment").GetComponent("Mundo");
         base.Init (coord);
         moveFromCoord = coord;
+        pathIndex = 0;
+
+        mapaNodos = Mundo.mapaNodos;
 
         //Si somos la primera generacion, tenemos genes random, sino los heredamos
         if(fatherVals.genes == null && motherVals.genes == null) {
@@ -354,12 +357,6 @@ public class Animal : LivingEntity {
         Act ();
     }*/
 
-    //Al hacer click en el objeto, hacemos que InformacionAnimal apunte a este animal
-    /*public void OnMouseDown(){
-        print("Click en mi");
-        GameObject.Find("InformacionAnimal").GetComponent<InformacionAnimal>().SetAnimal(this);
-    }*/
-
     //Ordena una lista de animales en funcion de quien esta mas cerca de la coordenada dada
     List<Animal> OrdenarListaAnimales(List<Animal> lista, Vector3Int origen){
         var aux = lista;
@@ -389,7 +386,7 @@ public class Animal : LivingEntity {
         potentialMates = OrdenarListaAnimales(potentialMates, coord);
         if(potentialMates.Count > 0) {
             //if(EnvironmentUtility.TileIsVisibile(coord.x, coord.z, potentialMates[0].coord.x, potentialMates[0].coord.z))
-            if(Pathfinder.SeccionVisible(coord.x, coord.z, potentialMates[0].coord.x, potentialMates[0].coord.z))
+            //if(Pathfinder.SeccionVisible(coord.x, coord.z, potentialMates[0].coord.x, potentialMates[0].coord.z))
                 CreatePath(potentialMates[0].coord);
         }
     }
@@ -404,9 +401,9 @@ public class Animal : LivingEntity {
         LivingEntity foodSource = Mundo.SentirComida(this, coord, maxViewDistance);
         if (foodSource) {
             CreatePath(foodSource.coord);
-            if(path != null){
+            if(path != null && path.Length > 0){
                 currentAction = CreatureAction.GoingToFood;
-            foodTarget = foodSource;
+                foodTarget = foodSource;
             }
             else{
                 currentAction = CreatureAction.Exploring;
@@ -421,11 +418,11 @@ public class Animal : LivingEntity {
         Vector3Int agua = Mundo.SentirAgua(coord, maxViewDistance);
         if(agua!=Mundo.invalid){
             CreatePath(agua);
-            //Puede que no veamos el agua
-            if(path!=null){
+            if(path!=null && path.Length > 0){
                 currentAction = CreatureAction.GoingToWater;
                 waterTarget = agua;
             }
+            //Puede que no veamos el agua
             else{
                 currentAction = CreatureAction.Exploring;
             }
@@ -501,7 +498,7 @@ public class Animal : LivingEntity {
                 if (CoordenadasVecinas(coord, foodTarget.coord)) {
                     LookAt (foodTarget.coord);
                     currentAction = CreatureAction.Eating;
-                } else if(path!=null){
+                }else if(path!=null){
                     if(path.Length > pathIndex){
                         StartMoveToCoord(path[pathIndex]);
                         pathIndex++;
@@ -512,11 +509,11 @@ public class Animal : LivingEntity {
                 if (CoordenadasVecinas(coord, waterTarget)) {
                     LookAt (waterTarget);
                     currentAction = CreatureAction.Drinking;
-                } else if(path!=null) {
+                }else if(path!=null){
                     if(path.Length > pathIndex){
                         StartMoveToCoord (path[pathIndex]);
                         pathIndex++;
-                    }
+                }
                 }
                 break;
             case CreatureAction.Fleeing:
@@ -589,9 +586,15 @@ public class Animal : LivingEntity {
     }
 
     //Camino mas cercano al target
-    protected void CreatePath (Vector3Int target) {
+    protected void CreatePath(Vector3Int target) {
         //Si target es fuera del mapa, devolvemos el limite del mapa
         target = ReducirDimensionesOverflow(target);
+
+        //Si queremos ir a una posicion no caminable, nos fastidiamos
+        //NO, EL AGUA NO ES CAMINABLE ASI QUE AQUI SIEMPRE DEVOLVIA NULL
+        //if(!Mundo.caminable[target.x, target.z])
+        //    return;
+
         //NOTA: Cuidado, cuando pathIndex vale 0 da error en el if en path[pathIndex - 1] porque esta pidiendo path[-1]
         //por eso esta el primer if pero seguro que hay una manera mas elegante de hacerlo
         // Create new path if current is not already going to target
@@ -599,15 +602,27 @@ public class Animal : LivingEntity {
             if (path == null || pathIndex >= path.Length || ( path[path.Length - 1] != target || path[pathIndex - 1] != moveTargetCoord )) {
             //if (path == null || pathIndex >= path.Length) {
                 //NOTA: Falla al buscar path en coordenadas no validas (agua o fin del mapa)
-                //puede que haya que mejorar el PathFinder
-                //path = Pathfinder.BresenhamError(coord.x, coord.z, target.x, target.z);
-                path = ListaCoordAListaVector3(EnvironmentUtility.GetPath(coord.x, coord.z, target.x, target.z));
+                path = Pathfinder.BresenhamError(coord.x, coord.z, target.x, target.z);
+                //path = ListaCoordAListaVector3(EnvironmentUtility.GetPath(coord.x, coord.z, target.x, target.z));
+
+                if(path == null){
+                    Mundo.ResetMapaNodos(mapaNodos);//Reseteamos el mapa por si un A* anterior lo ha modificado
+                    print("Llamamos a A*, a ver que pasa xD");
+                    path = Pathfinder.AStar(coord.x, coord.z, target.x, target.z, mapaNodos);
+                }
                 pathIndex = 0;
             }
         }
         else{
-            //path = Pathfinder.BresenhamError(coord.x, coord.z, target.x, target.z);
-            path = ListaCoordAListaVector3(EnvironmentUtility.GetPath(coord.x, coord.z, target.x, target.z));
+            path = Pathfinder.BresenhamError(coord.x, coord.z, target.x, target.z);
+            //path = ListaCoordAListaVector3(EnvironmentUtility.GetPath(coord.x, coord.z, target.x, target.z));
+
+            if(path == null){
+                Mundo.ResetMapaNodos(mapaNodos);//Reseteamos el mapa por si un A* anterior lo ha modificado
+                print("Llamamos a A*, a ver que pasa xD");
+                path = Pathfinder.AStar(coord.x, coord.z, target.x, target.z, mapaNodos);
+            }
+
             pathIndex = 0;
         }
     }
@@ -658,7 +673,6 @@ public class Animal : LivingEntity {
                 //Nos comemos un conejo
                 if( foodTarget.species ==  Species.Rabbit){
                     //print("Valor nutricional:" + ((Rabbit) ((Animal) foodTarget) ).valorNutricional);
-                    //hunger -= ((Rabbit) ((Animal) foodTarget) ).valorNutricional;
                     hunger -= ((Rabbit) ((Animal) foodTarget) ).valorNutricional;
                     if(hunger < 0 ){
                         hunger = 0;

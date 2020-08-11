@@ -757,7 +757,7 @@ public class Environment : MonoBehaviour {
         return aux;
     }
 
-    void OnDrawGizmosSelected(){
+    /*void OnDrawGizmosSelected(){
         var colorAux = Color.cyan;colorAux.a = 0.05f;
         Gizmos.color = colorAux;var b = speciesMaps[Species.Rabbit];
         foreach (var m in speciesMaps){
@@ -766,5 +766,5 @@ public class Environment : MonoBehaviour {
                 Gizmos.DrawCube(new Vector3(x.x, 0, x.z), new Vector3(m.Value.tamañoRegion, m.Value.tamañoRegion, m.Value.tamañoRegion));
             } 
         }
-    }
+    }*/
 }
