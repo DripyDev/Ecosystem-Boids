@@ -5,7 +5,6 @@ using static System.Math;
 
 public class Genes {
     const float mutationChance = .1f;
-    const float maxMutationAmount = .3f;
     static readonly System.Random prng = new System.Random ();
 
     public readonly bool isMale;

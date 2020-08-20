@@ -192,7 +192,8 @@ public class Rabbit : Animal {
                 Gizmos.DrawSphere(SumarCeroCinco(a.coord), 0.1f);
             }
             Gizmos.color = colorcito3;
-            Gizmos.DrawSphere(aMAsCercano.coord, 0.1f);
+            if(aMAsCercano != null)
+                Gizmos.DrawSphere(aMAsCercano.coord, 0.1f);
         }
     }
 }

@@ -9,7 +9,8 @@ using TerrainGeneration;
 public class Mundo : MonoBehaviour {
     //MAPA/MUNDO
     [Header ("MAPA / MUNDO")]
-    TerrainGenerator.TerrainData datosTerreno;
+    //TerrainGenerator.TerrainData datosTerreno;
+    GeneradorTerreno.DatosTerreno datosTerreno;
 
     ///<summary>El tamaño de las regiones en las que subdividimos el mundo para el mapa</summary>
     int tamañoRegionesMapa = 10;
@@ -56,7 +57,7 @@ public class Mundo : MonoBehaviour {
 
     //POBLACION
     [Header ("POBLACION")]
-    public Population[] poblacionInicial;
+    public Poblacion[] poblacionInicial;
     private static System.Random rnd;
 
     //Variables para textos
@@ -174,7 +175,7 @@ public class Mundo : MonoBehaviour {
         StartListaAnimales();
         //Llamamos a updateGrafs despues de 0,5 segundos de delay una vez cada segundo
         //InvokeRepeating("UpdateGrafs", 0.5f, 1f);
-        InvokeRepeating("SpawnPlantasTiempo", 0, 0.5f);
+        InvokeRepeating("SpawnPlantasTiempo", 0, 0.2f);
         
         foxHolder = GameObject.Find("FoxHolder");
         plantHolder = GameObject.Find("PlantHolder");
@@ -342,7 +343,7 @@ public class Mundo : MonoBehaviour {
         return TileRandom(origen);
     }
 
-    ///<summary>Recorremos las tiles caminables para igualar mapaNodos.caminables a ellos. Asi hacemos que el agua NO sea caminable</summary>
+    ///<summary>Funcion auxiliar en la que recorremos las tiles caminables para igualar mapaNodos.caminables a ellos. Asi hacemos que el agua NO sea caminable</summary>
     private void CaminablesAgua(){
         for (int x = 0; x < caminable.GetLength(0); x++) {
             for (int y = 0; y < caminable.GetLength(1); y++) {
@@ -360,13 +361,15 @@ public class Mundo : MonoBehaviour {
         var sw = System.Diagnostics.Stopwatch.StartNew ();
 
         //objeto generador de terreno
-        var terrainGenerator = FindObjectOfType<TerrainGenerator> ();
-        datosTerreno = terrainGenerator.Generate ();
+        /*var terrainGenerator = FindObjectOfType<TerrainGenerator> ();
+        datosTerreno = terrainGenerator.Generate ();*/
+        var terrainGenerator = FindObjectOfType<GeneradorTerreno> ();
+        datosTerreno = terrainGenerator.GenerarMeshTerreno();
 
-        centros = datosTerreno.tileCentres;
+        centros = datosTerreno.centros;
         //Terreno por el que se puede caminar
-        caminable = datosTerreno.walkable;
-        tamaño = datosTerreno.size;
+        caminable = datosTerreno.caminables;
+        tamaño = datosTerreno.centros.GetLength(0);
 
         mapaNodos = new Nodo[tamaño,tamaño];
         CaminablesAgua();//Tenemos en cuenta el agua para que no sea caminable
@@ -416,9 +419,8 @@ public class Mundo : MonoBehaviour {
         SpawnArboles();
 
         //walkableNeighboursMap = new Vector3Int[size, size][];
-
         // Find and store all walkable neighbours for each walkable tile on the map
-        for (int y = 0; y < datosTerreno.size; y++) {
+        /*for (int y = 0; y < datosTerreno.size; y++) {
             for (int x = 0; x < datosTerreno.size; x++) {
                 if (caminable[x, y]) {
                     List<Vector3Int> walkableNeighbours = new List<Vector3Int> ();
@@ -439,13 +441,13 @@ public class Mundo : MonoBehaviour {
                     //walkableNeighboursMap[x, y] = walkableNeighbours.ToArray ();
                 }
             }
-        }
+        }*/
 
         // Generate offsets within max view distance, sorted by distance ascending
         // Used to speed up per-tile search for closest water tile
         List<Coord> viewOffsets = new List<Coord> ();
-        //int viewRadius = Animal.maxViewDistance;
-        int viewRadius = 10;
+        //Como casi nunca van a llegar a ver mas de 20, usamos 20 para encontrar las aguas mas cercanas
+        int viewRadius = 20;
         int sqrViewRadius = viewRadius * viewRadius;
         for (int offsetY = -viewRadius; offsetY <= viewRadius; offsetY++) {
             for (int offsetX = -viewRadius; offsetX <= viewRadius; offsetX++) {
@@ -460,10 +462,11 @@ public class Mundo : MonoBehaviour {
 
         // Find closest accessible water tile for each tile on the map:
         aguaMasCercana = new Vector3Int[tamaño, tamaño];
-        for (int y = 0; y < datosTerreno.size; y++) {
-            for (int x = 0; x < datosTerreno.size; x++) {
+        for (int y = 0; y < datosTerreno.centros.GetLength(0); y++) {
+            for (int x = 0; x < datosTerreno.centros.GetLength(0); x++) {
                 bool foundWater = false;
                 if (caminable[x, y]) {
+                    //ViewOffsets son el numero de tiles que podemos llegar a ver, desde -20 a 20 sin incluir 0
                     for (int i = 0; i < viewOffsets.Count; i++) {
                         int targetX = x + viewOffsetsArr[i].x;
                         int targetY = y + viewOffsetsArr[i].y;
@@ -489,7 +492,7 @@ public class Mundo : MonoBehaviour {
 
     ///<summary>Spawneamos la poblacion inicial en coordenadas (caminables) aleatorias del mapa</summary>
     private void SpawnPoblacionInicial(){
-        foreach (Population pop in poblacionInicial){
+        foreach (Poblacion pop in poblacionInicial){
             for (int i = 0; i < pop.count; i++) {
                 if(pop.count <= 0)
                     break;
@@ -563,6 +566,10 @@ public class Mundo : MonoBehaviour {
                         Quaternion rotacion = Quaternion.Euler(rotX, rotY, rotZ);
                         var scale = (float) (rnd.Next(5,10)/10f);
                         MeshRenderer arbol = Instantiate(prefabArbol, centros[x,y], rotacion);
+                        //Prueba color aleatorio
+                        //System.Random randomAux = new System.Random(x+y);
+                        //arbol.material.color += new Color(randomAux.Next(0,10)/100f, randomAux.Next(0,10)/100f, 0);
+                        //Color pruebaColor = arbol.material.color + new Color(randomAux.Next(0,10)/100f, randomAux.Next(0,10)/100f, 0);
                         arbol.transform.parent = holder.transform;
                         arbol.transform.localScale *= scale;
                         caminable[x,y] = false;
@@ -571,7 +578,8 @@ public class Mundo : MonoBehaviour {
                     }
                     else{
                         //print("Añadimos centro a la lista de coordenadasCaminables: " + centros[x,y]);
-                        coordenadasCaminables.Add(Vector3Int.FloorToInt(centros[x,y]));
+                        //coordenadasCaminables.Add(Vector3Int.FloorToInt(centros[x,y] + new Vector3(centros.GetLength(0)/2f, 0f, centros.GetLength(1)/2f)) );
+                        coordenadasCaminables.Add(Vector3Int.FloorToInt(centros[x,y]) );
                     }
                 }
             }
@@ -622,12 +630,12 @@ public class Mundo : MonoBehaviour {
         path = Application.dataPath + "/Logs/CausasMuerte/causasMuerte_" + fechaSinBarras + ".txt";
         //Si no existe, lo creamos
         if(!File.Exists(path)){
-            File.WriteAllText(path, "Causas muerte\n Conejos \t Zorros");
+            File.WriteAllText(path, "Causas muerte\nConejos \t Zorros\n");
         }
         //Si existe, lo borramos y creamos uno nuevo
         else{
             File.Delete(path);
-            File.WriteAllText(path, "Causas muerte\n Conejos \t Zorros");
+            File.WriteAllText(path, "Causas muerte\n Conejos \t Zorros\n");
         }
     }
     private void OnApplicationQuit() {
@@ -663,7 +671,7 @@ public class Mundo : MonoBehaviour {
 
     //Estructura para guardar la poblacion de un tipo de entidad viva
     [System.Serializable]
-    public struct Population {
+    public struct Poblacion {
         public LivingEntity prefab;
         public int count;
     }

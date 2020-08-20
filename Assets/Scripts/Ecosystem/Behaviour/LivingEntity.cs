@@ -26,6 +26,8 @@ public class LivingEntity : MonoBehaviour {
     ///<summary>Inicializacion de la entidad en el mundo. guardamos su posicion y cargamos su material</summary>
     public virtual void Init (Vector3Int coord) {
         this.coord = coord;
+        //print("Coordenadas x: " + coord.x + " y: " + coord.z);
+        //print("Long mundo.centros: " + Mundo.centros.GetLength(0) + " , " + Mundo.centros.GetLength(1));
         transform.position = Mundo.centros[coord.x, coord.z];
 
         // Set material to the instance material

@@ -214,7 +214,7 @@ public class Animal : LivingEntity {
 //            material.color = (genes.isMale) ? (maleColour + new Color(edad,edad,edad,0)) : (femaleColour + new Color(edad,edad,edad,0));
 
         //Si somos crias
-        if(transform.localScale.x == 0.5f){
+        if(cria){
             //Consideramos al conejo como adulto y lo escalamos a 1
             if(edad >= 0.15f){
                 transform.localScale *=2;
@@ -265,97 +265,6 @@ public class Animal : LivingEntity {
             }
         }
     }
-
-    //A esta funcion se le llama una vez por frame
-    /*public virtual void Update () {
-        // Increase hunger, thirst and age over time
-        //Si somos mas rapidos pasaremos mas hambre y sed
-        hunger += Time.deltaTime * 1 / timeToDeathByHunger * (moveSpeed/1.5f);
-        thirst += Time.deltaTime * 1 / timeToDeathByThirst * (moveSpeed/1.5f);
-        edad += Time.deltaTime * 1 / timeToDeathByAge * ratioCrecimiento;
-        reproductiveUrge += Time.deltaTime * 1 / 350 * ratioReproductiveUrge;
-        Crecer();
-        comprobarEmbarazo();
-
-        
-        //material.color += new Color(material.color.r,edad,edad,0);
-
-        // Animate movement. After moving a single tile, the animal will be able to choose its next action
-        //puede que haya que cambiar esto para simular la velocidad¿?¿?¿?
-        if (animatingMovement) {
-            //print("-------------INICIO MOVIMIENTO---------------------");
-            AnimateMove ();
-        } else {
-            // Handle interactions with external things, like food, water, mates
-            HandleInteractions ();
-            float timeSinceLastActionChoice = Time.time - lastActionChooseTime;
-            //Elegimos la siguiente accion si ha pasado timeBetweenActionChoices segundos (1 segundo) desde la ultima accion
-            if (timeSinceLastActionChoice > timeBetweenActionChoices) {
-                ChooseNextAction ();
-            }
-        }
-        if (hunger >= 1) {
-            Die (CauseOfDeath.Hunger);
-        } else if (thirst >= 1) {
-            Die (CauseOfDeath.Thirst);
-        } else if (edad >= 1) {
-            Die (CauseOfDeath.Age);
-        }
-    }*/
-
-    //NOTA: De momento es un sistema reactivo, seria interesante cambiarlo a BDI
-    // Animals choose their next action after each movement step (1 tile),
-    // or, when not moving (e.g interacting with food etc), at a fixed time interval
-    /*protected virtual void ChooseNextAction () {
-        lastActionChooseTime = Time.time;
-        // Get info about surroundings
-
-        // Decide next action:
-        Vector3Int coordDepredadorCercano = Environment.SenseDepredador(species, coord, maxViewDistance);
-        //NOTA: Cambiar el species!=Species.Fox porque en el futuro puede que haya más animales. Cambiarlo a buscar en el diccionario de depredadores
-        if (coordDepredadorCercano.x+coordDepredadorCercano.y != 0 && species != Species.Fox) {
-            HuirDepredador(coordDepredadorCercano);
-        }
-        //NOTA: Repasar cuando elige que accion
-        else {
-            // Eat if (more hungry than thirsty) or (currently eating and not critically thirsty)
-            bool currentlyEating = currentAction == CreatureAction.Eating && foodTarget && hunger > 0;
-            bool wellFed = hunger < criticalPercent/1.5;
-            bool wellThirst = thirst < criticalPercent/1.5;
-            //Si estamos bien alimentados podemos buscar pareja
-            if(wellFed && wellThirst && reproductiveUrge>0.3){
-                FindMate();
-            }
-            //Si no estamos bien alimentados, vamos a buscar comida o agua
-            else{
-                if(hunger>thirst || currentlyEating){
-                    FindFood();
-                }
-                else{
-                    FindWater();
-                }
-            }*/
-            //if (hunger >= thirst || currentlyEating && thirst < criticalPercent && !wellFed) {
-            //Si no estamos bien alimentado y tenemos mas hambre que sed, comemos
-            /*if ( (hunger>thirst && !wellFed) || currentlyEating) {
-                FindFood ();
-            }
-            else{
-                // Si no estamos bien alimentados, bebemos
-                if(!wellThirst || reproductiveUrge < 0.6f) {
-                    FindWater ();
-                }
-                //Si estamos bien alimentados y reproductive urge es muy alto, buscamos reproducirnos
-                else{
-                    FindMate();
-                }
-            }*/
-        /*}
-        /*if (reproductiveUrge > 0.4f && !embarazada) {
-                FindMate();
-        }
-        Act ();
-    }*/
 
     //Ordena una lista de animales en funcion de quien esta mas cerca de la coordenada dada
     List<Animal> OrdenarListaAnimales(List<Animal> lista, Vector3Int origen){
@@ -416,13 +325,13 @@ public class Animal : LivingEntity {
 
     protected void FindWater () {
         Vector3Int agua = Mundo.SentirAgua(coord, maxViewDistance);
-        if(agua!=Mundo.invalid){
+        if(agua!=Mundo.invalid && Vector3.Distance(agua, coord) <= maxViewDistance){
             CreatePath(agua);
             if(path!=null && path.Length > 0){
                 currentAction = CreatureAction.GoingToWater;
                 waterTarget = agua;
             }
-            //Puede que no veamos el agua
+            //No somos capaces de llegar al agua (NOTA: SI USAMOS A* CASI NUNCA VA A PASAR ESTO)
             else{
                 currentAction = CreatureAction.Exploring;
             }
@@ -485,7 +394,8 @@ public class Animal : LivingEntity {
     //PERO VAMOS A VER, TONTOSHEISSE. (10,2) Y (11,2) ESTAN A DISTANCIA 1 Y SIN EMBARGO SON VECINOS. RAIZ DE 2 ES SI ES UN VECINO DIAGONAL
     protected bool CoordenadasVecinas(Vector3Int a, Vector3Int b){
         //NOTA: SI SON VECINOS LA DISTANCIA DE LAS POSICIONES NO ES 1, ES RAIZ DE 2, TONTO DEL CULO
-        return Vector3Int.Distance(a,b)<=Math.Sqrt(2);
+        //Evitamos usar la raiz para que sea mas eficaz. La y es diferente ahora pero nos da igual asi que... xD
+        return Mathf.Pow((a.x - b.x), 2f) + Mathf.Pow((a.z - b.z), 2f) < 2;
     }
 
     //Controla y ejecuta la accion que desea hacer el agente
@@ -496,6 +406,7 @@ public class Animal : LivingEntity {
                 break;
             case CreatureAction.GoingToFood:
                 if (CoordenadasVecinas(coord, foodTarget.coord)) {
+                    print("Somos vecinos la comida");
                     LookAt (foodTarget.coord);
                     currentAction = CreatureAction.Eating;
                 }else if(path!=null){
@@ -590,11 +501,6 @@ public class Animal : LivingEntity {
         //Si target es fuera del mapa, devolvemos el limite del mapa
         target = ReducirDimensionesOverflow(target);
 
-        //Si queremos ir a una posicion no caminable, nos fastidiamos
-        //NO, EL AGUA NO ES CAMINABLE ASI QUE AQUI SIEMPRE DEVOLVIA NULL
-        //if(!Mundo.caminable[target.x, target.z])
-        //    return;
-
         //NOTA: Cuidado, cuando pathIndex vale 0 da error en el if en path[pathIndex - 1] porque esta pidiendo path[-1]
         //por eso esta el primer if pero seguro que hay una manera mas elegante de hacerlo
         // Create new path if current is not already going to target
@@ -606,9 +512,9 @@ public class Animal : LivingEntity {
                 //path = ListaCoordAListaVector3(EnvironmentUtility.GetPath(coord.x, coord.z, target.x, target.z));
 
                 if(path == null){
-                    Mundo.ResetMapaNodos(mapaNodos);//Reseteamos el mapa por si un A* anterior lo ha modificado
-                    print("Llamamos a A*, a ver que pasa xD");
-                    path = Pathfinder.AStar(coord.x, coord.z, target.x, target.z, mapaNodos);
+                    //Mundo.ResetMapaNodos(mapaNodos);//Reseteamos el mapa por si un A* anterior lo ha modificado
+                    //print("Llamamos a A*, a ver que pasa xD");
+                    //path = Pathfinder.AStar(coord.x, coord.z, target.x, target.z, mapaNodos);
                 }
                 pathIndex = 0;
             }
@@ -618,9 +524,9 @@ public class Animal : LivingEntity {
             //path = ListaCoordAListaVector3(EnvironmentUtility.GetPath(coord.x, coord.z, target.x, target.z));
 
             if(path == null){
-                Mundo.ResetMapaNodos(mapaNodos);//Reseteamos el mapa por si un A* anterior lo ha modificado
-                print("Llamamos a A*, a ver que pasa xD");
-                path = Pathfinder.AStar(coord.x, coord.z, target.x, target.z, mapaNodos);
+                //Mundo.ResetMapaNodos(mapaNodos);//Reseteamos el mapa por si un A* anterior lo ha modificado
+                //print("Llamamos a A*, a ver que pasa xD");
+                //path = Pathfinder.AStar(coord.x, coord.z, target.x, target.z, mapaNodos);
             }
 
             pathIndex = 0;
@@ -672,7 +578,6 @@ public class Animal : LivingEntity {
                 //NOTA: Cambiar porque ahora solo funciona porque esta hecho a mano
                 //Nos comemos un conejo
                 if( foodTarget.species ==  Species.Rabbit){
-                    //print("Valor nutricional:" + ((Rabbit) ((Animal) foodTarget) ).valorNutricional);
                     hunger -= ((Rabbit) ((Animal) foodTarget) ).valorNutricional;
                     if(hunger < 0 ){
                         hunger = 0;

@@ -15,7 +15,7 @@ public class Mapa {
     public Mapa(int tamañoMapa, int tamañoR){
         this.tamañoRegion = tamañoR;
         this.numeroRegiones = tamañoMapa/tamañoRegion;
-        Debug.Log("Numero de regiones: " + numeroRegiones);
+        //Debug.Log("Numero de regiones: " + numeroRegiones * numeroRegiones);
         this.centros = new Vector3[numeroRegiones, numeroRegiones];
         this.mapaAnimales = new List<LivingEntity>[numeroRegiones,numeroRegiones];
         
