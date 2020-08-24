@@ -273,7 +273,8 @@ public class Mundo : MonoBehaviour {
                 }
             }
         }
-        return tilesCaminable[rnd.Next(0,tilesCaminable.Count)];
+        //Si se da el caso en el que estamos en una isla o entre arboles, nos quedamos quietos
+        return tilesCaminable.Count > 0? tilesCaminable[rnd.Next(0,tilesCaminable.Count)] : origen;
     }
 
     private static Vector3Int ComprobarOverflow(Vector3Int coord){
