@@ -4,15 +4,14 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TerrainGeneration;
 
-public class MainMenu : MonoBehaviour
-{
-    public Environment environment;
+public class MainMenu : MonoBehaviour {
+    public Mundo mundo;
     public TerrainGenerator terrainGen;
     //Funcion para cargar la escena del juego, llamarla al darle al boton de jugar
     public void PlayGame(){
         //environment = GameObject.Find("Environment").GetComponent<Environment>();
         //terrainGen.Generate();
-        environment.Start();
+        mundo.Start();
 
         //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     } 

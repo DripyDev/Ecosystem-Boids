@@ -406,7 +406,6 @@ public class Animal : LivingEntity {
                 break;
             case CreatureAction.GoingToFood:
                 if (CoordenadasVecinas(coord, foodTarget.coord)) {
-                    print("Somos vecinos la comida");
                     LookAt (foodTarget.coord);
                     currentAction = CreatureAction.Eating;
                 }else if(path!=null){

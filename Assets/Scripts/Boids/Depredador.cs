@@ -210,7 +210,9 @@ public class Depredador : MonoBehaviour
         for (int i = 0; i < numeroPuntos; i++){
             var theta = 2 * Math.PI * (i/goldenN);
             var phi = Math.Acos(1-2*(i+0.5f)/numeroPuntos);
-            puntos[i] = new Vector3((float) Math.Cos(theta)* (float) Math.Sin(phi), (float) Math.Sin(theta)* (float) Math.Sin(phi), (float) Math.Cos(phi));
+            puntos[i] = new Vector3((float) Math.Cos(theta)* (float) Math.Sin(phi), 
+                                    (float) Math.Sin(theta)* (float) Math.Sin(phi), 
+                                    (float) Math.Cos(phi));
         }
         return puntos;
     }
@@ -219,7 +221,6 @@ public class Depredador : MonoBehaviour
     ///<summary>Decidimos a donde nos movemos en funcion de los rayos casteados</summary>
     Vector3 ObstacleRays () {
         //Vector con las direcciones de los rayos en funcion del numero aureo
-        //Vector3[] rayDirections2 = BoidHelper.directions;
         Vector3[] rayDirections = EsferaFibonacci(300);
         //Si un rayo NO golpea, nos movemos en esa direccion
         for (int i = 0; i < rayDirections.Length; i++) {

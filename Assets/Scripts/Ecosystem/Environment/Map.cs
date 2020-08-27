@@ -46,9 +46,9 @@ public class Map {
                 LivingEntity entity = map[regionCoord.x, regionCoord.y][j];
                 float sqrDst = Coord.SqrDistance (VectorACoord(entity.coord), origin);
                 if (sqrDst < sqrViewDst) {
-                    if (EnvironmentUtility.TileIsVisibile (origin.x, origin.y, entity.coord.x, entity.coord.y)) {
+                    //if (EnvironmentUtility.TileIsVisibile (origin.x, origin.y, entity.coord.x, entity.coord.y)) {
                         visibleEntities.Add (entity);
-                    }
+                    //}
                 }
             }
         }
@@ -78,10 +78,10 @@ public class Map {
                 LivingEntity entity = map[regionCoord.x, regionCoord.y][j];
                 float sqrDst = Coord.SqrDistance (VectorACoord(entity.coord), origin);
                 if (sqrDst < closestSqrDst) {
-                    if (EnvironmentUtility.TileIsVisibile (origin.x, origin.y, entity.coord.x, entity.coord.y)) {
+                    //if (EnvironmentUtility.TileIsVisibile (origin.x, origin.y, entity.coord.x, entity.coord.y)) {
                         closestSqrDst = sqrDst;
                         closestEntity = entity;
-                    }
+                    //}
                 }
             }
         }

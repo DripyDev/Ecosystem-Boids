@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 ///<summary>Encargado de dividir el mundo en subregiones (X.X.X) y administrar los Boids que se encuentran en cada region</summary>
-public class RegionManager : MonoBehaviour
-{
+public class RegionManager : MonoBehaviour {
     //Suponemos que el suelo que nos dan tiene dimensiones AxA. Vamos a dividir en cubos a partir de sus valores X y Z de Scale
     public GameObject sueloMundo;
     //Se elije la dimension del cubo y al cubo daria el numero de regiones. 512=7x7x7, 64=4x4x4, 216=6x6x6...

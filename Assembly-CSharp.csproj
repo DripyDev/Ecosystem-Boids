@@ -82,7 +82,6 @@
      <Compile Include="Assets\Paquetes\TextMesh Pro\Examples &amp; Extras\Scripts\VertexZoom.cs" />
      <Compile Include="Assets\Paquetes\TextMesh Pro\Examples &amp; Extras\Scripts\WarpTextExample.cs" />
      <Compile Include="Assets\Scripts\Boids\Boid.cs" />
-     <Compile Include="Assets\Scripts\Boids\BoidHelper.cs" />
      <Compile Include="Assets\Scripts\Boids\Depredador.cs" />
      <Compile Include="Assets\Scripts\Boids\Menus\MenuController.cs" />
      <Compile Include="Assets\Scripts\Boids\RegionManager.cs" />
@@ -104,8 +103,6 @@
      <Compile Include="Assets\Scripts\Ecosystem\Datatypes\Genes.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Datatypes\Species.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Datatypes\Surroundings.cs" />
-     <Compile Include="Assets\Scripts\Ecosystem\Environment\Environment.cs" />
-     <Compile Include="Assets\Scripts\Ecosystem\Environment\EnvironmentUtility.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Environment\Map.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Environment\Mapa.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Environment\Mundo.cs" />
@@ -120,7 +117,6 @@
      <Compile Include="Assets\Scripts\Ecosystem\Terrain\FalloffGenerator.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Terrain\GeneradorTerreno.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Terrain\GeneradorTextura.cs" />
-     <Compile Include="Assets\Scripts\Ecosystem\Terrain\MapDisplay.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Terrain\Original\HeightmapGenerator.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Terrain\Original\Noise.cs" />
      <Compile Include="Assets\Scripts\Ecosystem\Terrain\Original\NoiseSettings.cs" />

@@ -33,6 +33,7 @@ public class GeneradorTerreno : MonoBehaviour {
     //MeshFilter y MeshRenderer del mesh que vamos a modificar
     public MeshFilter meshFilter;
     public MeshRenderer meshRenderer;
+    public Renderer texturaRender;
     //Informacion del mapa para que use el ecosistema
     public DatosTerreno datosTerreno;
 
@@ -62,6 +63,7 @@ public class GeneradorTerreno : MonoBehaviour {
         //Para sustituir el uso de MapDisplay
         meshFilter.sharedMesh = mesh;
         meshRenderer.sharedMaterial.mainTexture = GeneradorTextura.TextureFromColourMap(mapaColores, dimensionMapa, dimensionMapa);
+        //Devolvemos los datos necesarios para el mundo que se crean dentro de DatosMeshEnteros(), de momento no se crean en DatosMeshFloats()
         return datosTerreno;
     }
 
@@ -290,18 +292,31 @@ public class GeneradorTerreno : MonoBehaviour {
         mapaRuido = Ruido.GeneradorRuido(dimensionMapa, dimensionMapa, semilla, escala, octaves, persistencia, lacunaridad, offset, Ruido.NormalizeMode.Local);
         falloffMap = FalloffGenerator.GenerateFalloffMap(dimensionMapa);
         GenerarMapaColores();
-        //Obtenemos el script MapDisplay que esta en nuestro mismo GameObject
-        MapDisplay mapDisplay = FindObjectOfType<MapDisplay>();
-        if(modoDibujo == ModoDibujo.MapaRuido)
-            mapDisplay.DibujarTextura(GeneradorTextura.TextureFromHeigthMap(mapaRuido));
-        else if(modoDibujo == ModoDibujo.MapaColores)
-            mapDisplay.DibujarTextura(GeneradorTextura.TextureFromColourMap(mapaColores, dimensionMapa, dimensionMapa));
+        
+        if(modoDibujo == ModoDibujo.MapaRuido){
+            DibujarTextura(GeneradorTextura.TextureFromHeigthMap(mapaRuido));
+        }
+        else if(modoDibujo == ModoDibujo.MapaColores){
+            DibujarTextura(GeneradorTextura.TextureFromColourMap(mapaColores, dimensionMapa, dimensionMapa));
+            }
         else if(modoDibujo == ModoDibujo.Mesh){
             GenerarMeshTerreno();
             //mapDisplay.DibujarMesh2(mesh, GeneradorTextura.TextureFromColourMap(mapaColores, dimensionMapa, dimensionMapa));
         }
-        else if(modoDibujo == ModoDibujo.MapaFalloff)
-            mapDisplay.DibujarTextura(GeneradorTextura.TextureFromHeigthMap(FalloffGenerator.GenerateFalloffMap(dimensionMapa)));
+        else if(modoDibujo == ModoDibujo.MapaFalloff){
+            DibujarTextura(GeneradorTextura.TextureFromHeigthMap(FalloffGenerator.GenerateFalloffMap(dimensionMapa)));
+        }
+    }
+
+    //Funciones para alterar la textura y mesh del terreno
+    public void DibujarTextura(Texture2D textura){
+        texturaRender.sharedMaterial.mainTexture = textura;
+        texturaRender.transform.localScale = new Vector3(textura.width, 1, textura.height);
+    }
+
+    public void DibujarMesh2(Mesh mesh, Texture2D textura){
+        meshFilter.sharedMesh = mesh;
+        meshRenderer.sharedMaterial.mainTexture = textura;
     }
 
     //Para que se pueda crear desde el editor
