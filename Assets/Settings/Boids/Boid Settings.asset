@@ -16,7 +16,7 @@ MonoBehaviour:
     type: 3}
   minSpeed: 2
   maxSpeed: 8
-  radioPercepcion: 2.5
+  radioPercepcion: 2
   dstSeparacion: 0.5
   pesoCohesion: 1
   pesoSeparacion: 1

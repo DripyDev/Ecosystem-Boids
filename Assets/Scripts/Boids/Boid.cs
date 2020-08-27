@@ -264,7 +264,7 @@ public class Boid : MonoBehaviour {
         float speed = velocidad.magnitude;
         Vector3 dir = velocidad / speed;
         //origen, radio esfera que casteamos, direccion, informacion hit, maxima distancia casteo, mascara de obstaculos
-        if (Physics.SphereCast (transform.position, 0.2f, direccion, out hit, settings.radioPercepcion, settings.mascaraObstaculos))
+        if (Physics.SphereCast (transform.position, 0.4f, direccion, out hit, settings.radioPercepcion, settings.mascaraObstaculos))
             return true;
         else
             return false;
@@ -289,14 +289,14 @@ public class Boid : MonoBehaviour {
         Vector3[] rayDirections = EsferaFibonacci(300);
         //Si un rayo NO golpea, nos movemos en esa direccion
         for (int i = 0; i < rayDirections.Length; i++) {
-            Vector3 dir = rayDirections[i]-transform.position;
+            //Vector3 dir = rayDirections[i]-transform.position;
+            //Pasamos la direccion del espacio local a espacio global
+            Vector3 dir =this.transform.TransformDirection(rayDirections[i]);
             Ray ray = new Ray (transform.position, dir);
-
-            //Pasa la direccion de espacio local a espacio global. No tengo muy claro el porque
-            //Vector3 dir2 = this.transform.TransformDirection (rayDirections2[i]);
+            
             //Ray ray2 = new Ray (transform.position, dir2);
             //Devolvemos la direccion del primer rayo que no golpea un obstaculo
-            if (!Physics.SphereCast (ray, 0.2f, settings.distanciaEvitarColision, settings.mascaraObstaculos)) {
+            if (!Physics.SphereCast (ray, 0.4f, settings.radioPercepcion, settings.mascaraObstaculos)) {
                 rayo = ray;
                 return dir;
             }
