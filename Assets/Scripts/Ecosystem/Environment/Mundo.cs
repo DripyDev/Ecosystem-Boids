@@ -515,6 +515,7 @@ public class Mundo : MonoBehaviour {
         }
         if(ent.species == Species.Rabbit){
             ParametrosAleatorios(ent, 0.4f);
+            ( (Rabbit) ((Animal)ent) ).valorNutricional = Mathf.Max( (rnd.Next(80)/100f), 0.5f);
             ent.transform.parent = rabbitHolder.transform;
         }
         if(ent.species == Species.Plant){
@@ -545,8 +546,10 @@ public class Mundo : MonoBehaviour {
         //Colocamos la entidad en los holders
         if(ent.species == Species.Fox)
             ent.transform.parent = foxHolderAux.transform;
-        if(ent.species == Species.Rabbit)
+        if(ent.species == Species.Rabbit){
+            ( (Rabbit) ((Animal)ent) ).valorNutricional = Mathf.Max( (rnd.Next(80)/100f), 0.5f);
             ent.transform.parent = rabbitHolderAux.transform;
+        }
         if(ent.species == Species.Plant)
             ent.transform.parent = plantHolderAux.transform;
         

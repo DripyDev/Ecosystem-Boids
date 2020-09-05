@@ -290,7 +290,7 @@ public class Boid : MonoBehaviour {
         //Si un rayo NO golpea, nos movemos en esa direccion
         for (int i = 0; i < rayDirections.Length; i++) {
             //Vector3 dir = rayDirections[i]-transform.position;
-            //Pasamos la direccion del espacio local a espacio global
+            //Pasamos la direccion del espacio local a espacio global porque los puntos de EsferaFibonacci son en el origen (0,0), tenemos que pasarlo a nuestra posicion actual
             Vector3 dir =this.transform.TransformDirection(rayDirections[i]);
             Ray ray = new Ray (transform.position, dir);
             

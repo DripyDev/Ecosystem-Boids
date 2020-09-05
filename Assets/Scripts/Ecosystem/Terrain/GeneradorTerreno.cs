@@ -219,8 +219,9 @@ public class GeneradorTerreno : MonoBehaviour {
         datosTerreno = new DatosTerreno(centros, caminables, shore, indicesTerreno);
         /*if(vertices.Count >= 65025){
             print("CUIDADO. SE HA SUPERADO EL MAXIMO DE VERTICES EN UN MESH EN UNITY QUE ES 65025");
-            print("Numero vertices: " + vertices.Count);
+            
         }*/
+        print("Numero vertices: " + vertices.Count + " en un mundo " + dimensionMapa + " que debería de tener: " + (dimensionMapa*dimensionMapa*4) + " vertices");
         return new DatosMesh(vertices.ToArray(), triangulos.ToArray(), uvs.ToArray());
     }
 

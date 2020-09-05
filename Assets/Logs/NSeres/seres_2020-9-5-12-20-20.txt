@@ -1,0 +1,7 @@
+Numero de seres
+500c 50z 1000p 
+500c 50z 1005p 
+498c 50z 1010p 
+496c 50z 1008p 
+495c 50z 995p 
+495c 50z 976p 

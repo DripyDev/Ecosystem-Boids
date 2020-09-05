@@ -61,7 +61,7 @@ public class Fox : Animal{
         }
         //Si no estamos bien alimentados, vamos a buscar comida o agua
         else{
-            if(hunger>thirst || currentlyEating) {
+            if( (hunger>thirst && hunger > 0.2f) || currentlyEating) {
                 FindFood();
             }
             else{

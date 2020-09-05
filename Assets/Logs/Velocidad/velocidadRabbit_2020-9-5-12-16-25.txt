@@ -1,0 +1,3 @@
+Velocidad media
+1,511199
+1,511405

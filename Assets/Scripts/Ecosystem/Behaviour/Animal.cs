@@ -49,6 +49,7 @@ public class Animal : LivingEntity {
 
     // State:
     [Header ("State")]
+    public bool macho;
     public float hunger;
     public float thirst;
     public float edad;
@@ -90,6 +91,7 @@ public class Animal : LivingEntity {
     ///<summary>Hacemos los cambios necesarios en funcion de los genes del animal</summary>
     void ComprobarGenes(){
         material.color = (genes.isMale) ? maleColour : femaleColour;
+        macho = genes.isMale;
         //NO ESTA SUMANDO BIEN LAS VELOCIDADES
         //Prueba gen velocidad:
         //SI LA VELOCIDAD EN FUNCION DE SI TIENE PADRES O NO LA PONEMOS EN INIT, AQUI SOLO HAY QUE SUMARLE Y COMPROBAR QUE SEA UNA CRIA
@@ -100,7 +102,7 @@ public class Animal : LivingEntity {
         //Prueba gen deseabilidad (solo para machos):
         if(genes.values[1] && genes.isMale){
             //print("Gen deseabilidad activado. I AM SEXY, BOY");
-            material.color += new Color(material.color.r + 0.3f,0,0,0);
+            material.color += new Color(material.color.r + 0.2f,0,0,0);
         }
         //Prueba gen tiempo embarazo:
         if(genes.values[2] && !genes.isMale){
@@ -606,7 +608,7 @@ public class Animal : LivingEntity {
         // Move in an arc from start to end tile
         moveTime = Mathf.Min (1, moveTime + Time.deltaTime * moveSpeed * moveSpeedFactor);
         //Altura del salto para moverse entre tiles
-        float height = (1 - 4 * (moveTime - .5f) * (moveTime - .5f)) * moveArcHeight * moveArcHeightFactor;
+        float height = (1.5f - 4 * (moveTime - .5f) * (moveTime - .5f)) * moveArcHeight * moveArcHeightFactor;
         transform.position = Vector3.Lerp (moveStartPos, moveTargetPos, moveTime) + Vector3.up * height;
 
         // Finished moving
@@ -622,6 +624,7 @@ public class Animal : LivingEntity {
             ChooseHijo();
         }
     }
+    
     //Funcion que en Fox y Rabbit va a ser sobreescrita para que llame a ChooseNextAction. Asi lo podemos llamar desde aqui
     protected virtual void ChooseHijo(){
         //print("Llamamos a pruebaChoose desde Animal");

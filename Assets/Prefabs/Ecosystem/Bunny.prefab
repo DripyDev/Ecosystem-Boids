@@ -59,7 +59,7 @@ MonoBehaviour:
   currentAction: 0
   val: 
   maleColour: {r: 0.35686275, g: 0.23137257, b: 0.12941177, a: 0}
-  femaleColour: {r: 0.6509804, g: 0.45098042, b: 0.32156864, a: 0}
+  femaleColour: {r: 1, g: 0, b: 0.74001884, a: 0}
   env: {fileID: 0}
   moveSpeed: 1.5
   ratioCrecimiento: 1
@@ -76,6 +76,7 @@ MonoBehaviour:
   hembrasNoImpresionadas: []
   moveFromCoord: {x: 0, y: 0, z: 0}
   path: []
+  pathIndex: 0
   valorNutricional: 0
   depredadorMasCercano: {x: 0, y: 0, z: 0}
 --- !u!114 &3874918950189636065
@@ -119,6 +120,7 @@ MonoBehaviour:
   hembrasNoImpresionadas: []
   moveFromCoord: {x: 0, y: 0, z: 0}
   path: []
+  pathIndex: 0
 --- !u!65 &-3800553892912618399
 BoxCollider:
   m_ObjectHideFlags: 0

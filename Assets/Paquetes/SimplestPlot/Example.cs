@@ -157,8 +157,8 @@ public class Example : MonoBehaviour
             ZorrosX.Add((float) environment.grafZorros.Count);
             ZorrosY.Add((float) environment.grafZorros[environment.grafZorros.Count - 1]);
             //Para evitar que la escala de la grafica de las plantas no deje diferenciar las otras
-            if(environment.grafPlantas[environment.grafPlantas.Count - 1]>450)
-                PlantasY.Add(450f);
+            if(environment.grafPlantas[environment.grafPlantas.Count - 1]>700)
+                PlantasY.Add(700);
             else
                 PlantasY.Add((float) environment.grafPlantas[environment.grafPlantas.Count - 1]);    
             PlantasX.Add((float) environment.grafPlantas.Count);

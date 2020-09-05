@@ -79,13 +79,11 @@ public class GVelocidad : MonoBehaviour
         InvokeRepeating("UpdateGrafica", 0f, 10f);
     }
 
-    void UpdateGrafica()
-    {
+    void UpdateGrafica() {
         Counter++;
         PrepareArrays();
         SimplestPlotScript.MyPlotType = PlotExample;
-        switch (PlotExample)
-        {
+        switch (PlotExample) {
             case SimplestPlot.PlotType.TimeSeries:
                 SimplestPlotScript.SeriesPlotY[0].YValues = velocidadMedia.ToArray();
                 SimplestPlotScript.SeriesPlotX = tiempo.ToArray();
@@ -100,34 +98,44 @@ public class GVelocidad : MonoBehaviour
         //El tiempo avanza en 1 cada 10 segundos
         tiempo.Add(Time.fixedTime/10f);
         if(especieGrafica == Species.Rabbit){
+            float media = 0f;
             //Si ya no hay zorros o conejos, matamos el proceso
-            if(mundo.grafConejos[mundo.grafConejos.Count - 1]<=0)
-                this.enabled=false;
-            float media = (mundo.velocidadConejos/mundo.grafConejos[mundo.grafConejos.Count - 1]);
-            //print("Sumatorio velocidad conejos: " + mundo.velocidadConejos + " numero conejos: " + mundo.grafConejos[mundo.grafConejos.Count - 1]);
-            //print("Velocidad media conejos: " + media );
-            //Como es asincrono, a veces puede pasar que coja el sumatorio actualizado pero el numero sin actualizar.
-            //la media NO puede ser menor a 1.5, si lo es, es problema de la sincronizacion y lo ignoramos
-            if(media >=1.5)
+            if(mundo.grafConejos[mundo.grafConejos.Count - 1]<=0){
                 velocidadMedia.Add(media);
-            else
-                velocidadMedia.Add(1.5f);
+                this.enabled=false;
+            }
+            else{
+                media = (mundo.velocidadConejos/mundo.grafConejos[mundo.grafConejos.Count - 1]);
+                //print("Sumatorio velocidad conejos: " + mundo.velocidadConejos + " numero conejos: " + mundo.grafConejos[mundo.grafConejos.Count - 1]);
+                //print("Velocidad media conejos: " + media );
+                //Como es asincrono, a veces puede pasar que coja el sumatorio actualizado pero el numero sin actualizar.
+                //la media NO puede ser menor a 1.5, si lo es, es problema de la sincronizacion y lo ignoramos
+                if(media >=1.5)
+                    velocidadMedia.Add(media);
+                else
+                    velocidadMedia.Add(1.5f);
+            }
             if(crearTxt){
                 File.AppendAllText(path,  media+"\n" );
             }
         }
         if(especieGrafica == Species.Fox){
-            if(mundo.grafZorros[mundo.grafZorros.Count - 1]<=0)
-                this.enabled=false;
-            float media = (mundo.velocidadZorros/mundo.grafZorros[mundo.grafZorros.Count - 1]);
-            //print("Sumatorio velocidad zorros: " + mundo.velocidadZorros + " numero zorros: " + mundo.grafZorros[mundo.grafZorros.Count - 1]);
-            //print("Velocidad media zorros: " + media );
-            //Como es asincrono, a veces puede pasar que coja el sumatorio actualizado pero el numero sin actualizar.
-            //la media NO puede ser menor a 1.5, si lo es, es problema de la sincronizacion y lo ignoramos
-            if(media >=1.5)
+            float media = 0f;
+            if(mundo.grafZorros[mundo.grafZorros.Count - 1]<=0){
                 velocidadMedia.Add(media);
-            else
-                velocidadMedia.Add(1.5f);
+                this.enabled=false;
+            }
+            else{
+                media = (mundo.velocidadZorros/mundo.grafZorros[mundo.grafZorros.Count - 1]);
+                //print("Sumatorio velocidad zorros: " + mundo.velocidadZorros + " numero zorros: " + mundo.grafZorros[mundo.grafZorros.Count - 1]);
+                //print("Velocidad media zorros: " + media );
+                //Como es asincrono, a veces puede pasar que coja el sumatorio actualizado pero el numero sin actualizar.
+                //la media NO puede ser menor a 1.5, si lo es, es problema de la sincronizacion y lo ignoramos
+                if(media >=1.5)
+                    velocidadMedia.Add(media);
+                else
+                    velocidadMedia.Add(1.5f);
+            }
             if(crearTxt){
                 File.AppendAllText(path,  media+"\n" );
             }

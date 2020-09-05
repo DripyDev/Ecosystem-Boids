@@ -12,10 +12,10 @@ public class Rabbit : Animal {
     //Variables que antes estaban en Animal
     public Vector3Int depredadorMasCercano;
     private static Vector3Int cero = new Vector3Int(0,0,0);
-    void Start() {
+    /*void Start() {
         var aux = new System.Random();
-        valorNutricional = Mathf.Max( (aux.Next(60)/100f), 0.3f);
-    }
+        valorNutricional = Mathf.Max( (aux.Next(80)/100f), 0.5f);
+    }*/
     
     public void Update() {
         // Increase hunger, thirst and age over time
